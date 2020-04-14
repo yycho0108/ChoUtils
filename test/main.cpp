@@ -11,7 +11,7 @@ int main()
     std::cout << CU_VERSION_MINOR << std::endl;
     std::cout << CU_VERSION_PATCH << std::endl;
 
-    cho_util::util::Timer timer{ true };
+    cho_util::util::MTimer timer{ true };
     cho_util::core::RNG rng;
     const std::vector<float> times = cho_util::core::Linspace(0, 100, 100);
     for (const auto& x : times) {
@@ -20,5 +20,5 @@ int main()
     rng.SetSeed(1023123);
     std::cout << rng.Randu() << std::endl;
     std::cout << rng.Randn() << std::endl;
-    std::cout << timer.stopAndGetElapsedTime() << std::endl;
+    std::cout << timer.StopAndGetElapsedTime() << std::endl;
 }

@@ -5,44 +5,44 @@
 namespace cho_util {
 namespace util {
 
+template <typename Duration = std::chrono::duration<double, std::milli>>
 class Timer {
  public:
-  inline Timer(bool start = false) {
-    if (start) start_time_ = std::chrono::high_resolution_clock::now();
+  using Clock = std::chrono::high_resolution_clock;
+  using Count = typename Duration::rep;
+
+  inline Timer(const bool start = false) {
+    if (start) {
+      this->Start();
+    }
   }
 
-  inline Timer& start() {
-    start_time_ = std::chrono::high_resolution_clock::now();
-    return *this;
-  }
+  inline void Start() { start_time_ = Clock::now(); }
 
-  inline Timer& stop() {
-    stop_time_ = std::chrono::high_resolution_clock::now();
-    return *this;
-  }
+  inline void Stop() { stop_time_ = Clock::now(); }
 
-  template <class DurationT = std::chrono::duration<double, std::milli>>
-  inline typename DurationT::rep getElapsedTimeSinceStart() const {
-    return std::chrono::duration_cast<DurationT>(
-               std::chrono::high_resolution_clock::now() - start_time_)
+  inline Count GetElapsedTimeSinceStart() const {
+    return std::chrono::duration_cast<Duration>(Clock::now() - start_time_)
         .count();
   }
 
-  template <class DurationT = std::chrono::duration<double, std::milli>>
-  inline typename DurationT::rep getElapsedTime() const {
-    return std::chrono::duration_cast<DurationT>(stop_time_ - start_time_)
+  inline Count GetElapsedTime() const {
+    return std::chrono::duration_cast<Duration>(stop_time_ - start_time_)
         .count();
   }
 
-  template <class DurationT = std::chrono::duration<double, std::milli>>
-  inline typename DurationT::rep stopAndGetElapsedTime() {
-    return stop().template getElapsedTime<DurationT>();
+  inline Count StopAndGetElapsedTime() {
+    Stop();
+    return GetElapsedTime();
   }
 
  private:
-  std::chrono::time_point<std::chrono::high_resolution_clock> start_time_;
-  std::chrono::time_point<std::chrono::high_resolution_clock> stop_time_;
+  std::chrono::time_point<Clock> start_time_;
+  std::chrono::time_point<Clock> stop_time_;
 };
+
+using MTimer = Timer<std::chrono::duration<double, std::milli>>;
+using UTimer = Timer<std::chrono::duration<double, std::micro>>;
 
 }  // namespace util
 }  // namespace cho_util

@@ -13,20 +13,29 @@
 #include <boost/iostreams/stream.hpp>
 #include <boost/iostreams/stream_buffer.hpp>
 
+#include "cho_util/vis/io.hpp"
+
 namespace cho_util {
 namespace vis {
 
 /**
  * Pipe listener
  */
-template <typename T>
-struct FdListener {
+template <typename DataType>
+struct FdListener : Listener<FdListener<DataType>> {
  public:
-  FdListener(int fd, std::function<bool(T&&)>& on_data)
+  FdListener(int fd) : fd(fd) {}
+
+  FdListener(int fd, std::function<bool(DataType&&)>& on_data)
       : fd(fd), on_data(on_data) {}
 
+  template <typename Callback>
+  void SetCallback(const Callback& on_data) {
+    this->on_data = on_data;
+  }
+
   void Start() {
-    t = std::async(std::launch::async, [this] {
+    worker = std::async(std::launch::async, [this] {
       // Convert file descriptor to stream archive format.
       boost::iostreams::file_descriptor_source fds{
           fd, boost::iostreams::file_descriptor_flags::never_close_handle};
@@ -34,17 +43,20 @@ struct FdListener {
           fds);
       boost::archive::binary_iarchive ar(fin);
 
-      T data;
+      DataType data;
       while (!quit && fin) {
         ar >> data;
-        quit |= on_data(std::move(data));
+        quit |= OnData(std::move(data));
       }
     });
   }
 
+  inline bool OnData(DataType&& data) const { return on_data(std::move(data)); }
+  inline bool IsRunning() const { return IsThreadRunning(); }
+
   inline bool IsThreadRunning() const {
-    if (t.valid()) {
-      auto status = t.wait_for(std::chrono::seconds(0));
+    if (worker.valid()) {
+      auto status = worker.wait_for(std::chrono::seconds(0));
       if (status == std::future_status::ready) {
         return false;
       }
@@ -58,21 +70,21 @@ struct FdListener {
     while (IsThreadRunning()) {
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
-    t = std::future<void>();
+    worker = std::future<void>();
   }
   ~FdListener() { Stop(); }
 
  private:
   int fd{0};
   bool quit{false};
-  std::future<void> t;
-  std::function<bool(T&&)> on_data;
+  std::future<void> worker;
+  std::function<bool(DataType&&)> on_data;
 };
 
 /**
  * Lightweight wrapper to handle comm.
  */
-struct FdWriter {
+struct FdWriter : Writer<FdWriter> {
   inline FdWriter(int fd)
       : fd(fd),
         fds{fd, boost::iostreams::file_descriptor_flags::never_close_handle},

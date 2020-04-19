@@ -9,8 +9,21 @@ namespace cho_util {
 namespace vis {
 
 struct RenderData {
-  enum RenderType : std::int16_t { kNone, kPoints, kPlane, kBox, kUser };
-  enum class Representation : std::int16_t { kPoints, kWireframe, kSurface };
+  enum RenderType : std::int16_t {
+    kNone,
+    kPoints,
+    kLines,
+    kPlane,
+    kSphere,
+    kBox,
+    kUser
+  };
+  enum class Representation : std::int16_t {
+    kNone,
+    kPoints,
+    kWireframe,
+    kSurface
+  };
 
   friend class boost::serialization::access;
   template <class Archive>

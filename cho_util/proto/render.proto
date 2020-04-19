@@ -36,13 +36,17 @@ message RenderRequest {
   RenderType type = 2;
   RepresentationType representation = 3;
   oneof color {
-    Color uniform = 5;
-    Colors each = 6;
+    Color uniform = 4;
+    Colors each = 5;
   }
   oneof data {
-    PointCloud cloud = 4;
+    PointCloud cloud = 7;
+    Lines lines = 8;
+    Plane plane = 9;
+    Sphere sphere = 10;
+    Cuboid cuboid = 11;
   }
-  float opacity = 7;
+  float opacity = 6;
 }
 
 // response (set success flag ?)

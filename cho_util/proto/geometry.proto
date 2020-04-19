@@ -20,6 +20,19 @@ message PointCloud {
   repeated Vector3f points = 1;
 }
 
+message Line {
+  Vector3f start = 1;
+  Vector3f end = 2;
+}
+
+message Lines {
+  repeated Line lines = 1;
+}
+
+message Linestrip {
+  repeated Vector3f points = 1;
+}
+
 message Plane {
   Vector3f center = 1;
   Vector3f normal = 2;
@@ -40,4 +53,9 @@ message Cuboid {
     MinMax min_max = 1;
     CenterRadius center_radius = 2;
   }
+}
+
+message Sphere {
+  Vector3f center = 1;
+  float radius = 2;
 }

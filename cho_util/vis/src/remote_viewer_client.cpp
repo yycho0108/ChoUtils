@@ -26,6 +26,125 @@ using render::RenderRequest;
 namespace cho_util {
 namespace vis {
 
+void Convert(const RenderData& rd, RenderRequest* const req) {
+  req->set_name(rd.tag);
+  req->set_type(static_cast<render::RenderType>(rd.render_type));
+  req->set_representation(
+      static_cast<render::RepresentationType>(rd.representation));
+
+  // opacity 1.0 for now.
+  req->set_opacity(1.0f);
+
+  switch (rd.render_type) {
+    case RenderData::RenderType::kNone: {
+      req->set_type(render::RenderType::kNone);
+      break;
+    }
+    case RenderData::RenderType::kPoints: {
+      req->set_type(render::RenderType::kPoints);
+      auto cloud = new PointCloud();
+      for (int i = 0; i < rd.data.size(); i += 3) {
+        auto v = cloud->add_points();
+        v->set_x(rd.data[i + 0]);
+        v->set_y(rd.data[i + 1]);
+        v->set_z(rd.data[i + 2]);
+      }
+      req->set_allocated_cloud(cloud);
+      break;
+    }
+    case RenderData::RenderType::kLines: {
+      req->set_type(render::RenderType::kLines);
+      auto lines = new Lines();
+      for (int i = 0; i < rd.data.size(); i += 6) {
+        auto l = lines->add_lines();
+        auto start = new Vector3f();
+        auto end = new Vector3f();
+        start->set_x(rd.data[i + 0]);
+        start->set_y(rd.data[i + 1]);
+        start->set_z(rd.data[i + 2]);
+        start->set_x(rd.data[i + 3]);
+        start->set_y(rd.data[i + 4]);
+        start->set_z(rd.data[i + 5]);
+        l->set_allocated_end(end);
+        l->set_allocated_start(start);
+      }
+      req->set_allocated_lines(lines);
+      break;
+    }
+    case RenderData::RenderType::kPlane: {
+      req->set_type(render::RenderType::kPlane);
+      auto plane = new Plane();
+      auto center = new Vector3f();
+      auto normal = new Vector3f();
+      center->set_x(rd.data[0]);
+      center->set_y(rd.data[1]);
+      center->set_z(rd.data[2]);
+      normal->set_x(rd.data[3]);
+      normal->set_y(rd.data[4]);
+      normal->set_z(rd.data[5]);
+      plane->set_allocated_center(center);
+      plane->set_allocated_normal(normal);
+      req->set_allocated_plane(plane);
+      break;
+    }
+    case RenderData::RenderType::kSphere: {
+      req->set_type(render::RenderType::kSphere);
+      auto sphere = new Sphere();
+      auto center = new Vector3f();
+      auto normal = new Vector3f();
+      center->set_x(rd.data[0]);
+      center->set_y(rd.data[1]);
+      center->set_z(rd.data[2]);
+      sphere->set_allocated_center(center);
+      sphere->set_radius(rd.data[3]);
+      req->set_allocated_sphere(sphere);
+      break;
+    }
+    case RenderData::RenderType::kBox: {
+      req->set_type(render::RenderType::kCuboid);
+      auto cuboid = new Cuboid();
+      auto min_max = new Cuboid::MinMax();
+      auto min = new Vector3f();
+      auto max = new Vector3f();
+      min->set_x(rd.data[0]);
+      min->set_y(rd.data[1]);
+      min->set_z(rd.data[2]);
+      max->set_x(rd.data[3]);
+      max->set_y(rd.data[4]);
+      max->set_z(rd.data[5]);
+      min_max->set_allocated_min(min);
+      min_max->set_allocated_max(max);
+      cuboid->set_allocated_min_max(min_max);
+      req->set_allocated_cuboid(cuboid);
+      break;
+    }
+    case RenderData::RenderType::kUser: {
+      break;
+    }
+  }
+
+  // Set Color.
+
+  if (rd.color.size() == 3) {
+    // uniform
+    auto color = new Color();
+    color->set_r(rd.color[0] / 255.0f);
+    color->set_g(rd.color[1] / 255.0f);
+    color->set_b(rd.color[2] / 255.0f);
+    req->set_allocated_uniform(color);
+  }
+  if (rd.color.size() > 3) {
+    auto colors = new Colors();
+    for (int i = 0; i < rd.color.size(); i += 3) {
+      auto color = colors->add_colors();
+      color->set_r(rd.color[i] / 255.0f);
+      color->set_g(rd.color[i + 1] / 255.0f);
+      color->set_b(rd.color[i + 2] / 255.0f);
+    }
+    req->set_allocated_each(colors);
+  }
+}
+
 RenderClient::RenderClient(const std::string& channel)
     : stub_(Renderer::NewStub(
           grpc::CreateChannel(channel, grpc::InsecureChannelCredentials()))) {}
@@ -35,7 +154,7 @@ RenderClient::RenderClient(const std::string& channel)
 void RenderClient::Render(const RenderData& rd) {
   // Data we are sending to the server.
   RenderRequest request;
-  request.set_name(rd.tag);
+  Convert(rd, &request);
 
   // Container for the data we expect from the server.
   RenderReply reply;

@@ -28,6 +28,101 @@ using render::Renderer;
 using render::RenderReply;
 using render::RenderRequest;
 
+void AppendVector3f(const Vector3f& v, std::vector<float>* const data) {
+  data->emplace_back(v.x());
+  data->emplace_back(v.y());
+  data->emplace_back(v.z());
+}
+
+void Convert(const RenderRequest& req, RenderData* const rd) {
+  rd->tag = req.name();
+  rd->render_type = req.type();
+  rd->representation =
+      static_cast<RenderData::Representation>(req.representation());
+  rd->quit = false;
+
+  // Set Points.
+  rd->data.clear();
+  rd->color.clear();
+  switch (req.type()) {
+    case render::kNone: {
+      break;
+    }
+    case render::kPoints: {
+      rd->data.reserve(req.cloud().points_size() * 3);
+      for (int i = 0; i < req.cloud().points_size(); ++i) {
+        AppendVector3f(req.cloud().points(i), &rd->data);
+      }
+      break;
+    }
+    case render::kLines: {
+      throw std::invalid_argument("kLines not implemented");
+      break;
+    }
+    case render::kPlane: {
+      rd->data.reserve(6);
+      AppendVector3f(req.plane().center(), &rd->data);
+      AppendVector3f(req.plane().normal(), &rd->data);
+      break;
+    }
+    case render::kSphere: {
+      rd->data.reserve(4);
+      AppendVector3f(req.sphere().center(), &rd->data);
+      rd->data.emplace_back(req.sphere().radius());
+      break;
+    }
+    case render::kCuboid: {
+      rd->data.reserve(6);
+      switch (req.cuboid().bounds_case()) {
+        case Cuboid::kMinMax: {
+          AppendVector3f(req.cuboid().min_max().min(), &rd->data);
+          AppendVector3f(req.cuboid().min_max().max(), &rd->data);
+          break;
+        }
+        case Cuboid::kCenterRadius: {
+          const auto& center = req.cuboid().center_radius().center();
+          const auto& radius = req.cuboid().center_radius().radius();
+          rd->data.emplace_back(center.x() - radius.x());
+          rd->data.emplace_back(center.y() - radius.y());
+          rd->data.emplace_back(center.z() - radius.z());
+          rd->data.emplace_back(center.x() + radius.x());
+          rd->data.emplace_back(center.y() + radius.y());
+          rd->data.emplace_back(center.z() + radius.z());
+          break;
+        }
+        default: {
+          throw std::invalid_argument("Must be one of kMinMax/kCenterRadius");
+          break;
+        }
+      }
+    }
+    default: { break; }
+  }
+
+  // Set Color.
+  rd->color.clear();
+  switch (req.color_case()) {
+    case render::RenderRequest::kUniform: {
+      rd->color.reserve(3);
+      rd->color.emplace_back(req.uniform().r() * 255);
+      rd->color.emplace_back(req.uniform().g() * 255);
+      rd->color.emplace_back(req.uniform().b() * 255);
+      break;
+    }
+    case render::RenderRequest::kEach: {
+      rd->color.reserve(req.each().colors_size() * 3);
+      for (int i = 0; i < req.each().colors_size(); ++i) {
+        rd->color.emplace_back(req.each().colors(i).r() * 255);
+        rd->color.emplace_back(req.each().colors(i).g() * 255);
+        rd->color.emplace_back(req.each().colors(i).b() * 255);
+      }
+      break;
+    }
+    default:
+      break;
+  }
+}
+
 template <typename DataType>
 RenderServer<DataType>::RenderServer(const std::string& address)
     : address_(address) {}
@@ -100,21 +195,15 @@ void RenderServer<DataType>::CallData::Proceed() {
     new CallData(parent, service_, cq_);
 
     // The actual processing.
-    // TODO(yycho0108): Implement this
-
+    // FIXME(yycho0108): Implement this
     bool quit;
     if (0) {
+      // request_.SerializeToString
       auto rd = *reinterpret_cast<DataType*>(&request_);
       quit = parent->OnData(std::move(rd));
     } else {
       RenderData rd;
-      rd.tag = "points";
-      rd.render_type = RenderData::RenderType::kPoints;
-      rd.representation = RenderData::Representation::kPoints;
-      rd.quit = false;
-      rd.data.resize(128 * 3);
-      std::generate(rd.data.begin(), rd.data.end(),
-                    []() { return static_cast<float>(rand()) / RAND_MAX; });
+      Convert(request_, &rd);
       quit = parent->OnData(std::move(rd));
     }
 

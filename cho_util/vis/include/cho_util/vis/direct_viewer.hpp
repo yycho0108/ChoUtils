@@ -14,7 +14,6 @@
 #include "cho_util/vis/subprocess.hpp"
 #include "cho_util/vis/vtk_viewer_fwd.hpp"
 
-
 namespace cho_util {
 namespace vis {
 
@@ -47,8 +46,7 @@ class DirectViewer {
   std::shared_ptr<thread_safe_queue<RenderData>> data_queue_;
   std::shared_ptr<thread_safe_queue<RenderData>> event_queue_;
 
-  VtkViewerPtr<QueueListenerPtr<RenderData>, QueueWriterPtr<RenderData>>
-      viewer_;
+  VtkViewerPtr viewer_;
   QueueWriterPtr<RenderData> data_writer_;
   // QueueListenerPtr<EventData> event_listener_;
 

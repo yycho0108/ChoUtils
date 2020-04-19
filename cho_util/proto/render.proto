@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+import "geometry.proto";
+
+package render;
+
+// The greeting service definition.
+service Renderer {
+  // Sends a greeting
+  rpc Render(RenderRequest) returns (RenderReply) {
+  }
+}
+
+enum RenderType {
+  kNone = 0;
+  kPoints = 1;
+  kLines = 2;
+  // kLineLoop, kLineStrip, kTriangles ...
+  kPlane = 3;
+
+  // higher-order geometries
+  kSphere = 4;
+  kCuboid = 5;
+}
+
+enum RepresentationType {
+  kAsNone = 0;  // hide
+  kAsPoints = 1;
+  kAsSurface = 2;
+  kAsWireframe = 3;
+}
+
+// request
+message RenderRequest {
+  string name = 1;
+  RenderType type = 2;
+  RepresentationType representation = 3;
+  oneof color {
+    Color uniform = 5;
+    Colors each = 6;
+  }
+  oneof data {
+    PointCloud cloud = 4;
+  }
+  float opacity = 7;
+}
+
+// response (set success flag ?)
+message RenderReply {
+  string message = 1;
+}

@@ -22,17 +22,15 @@ namespace vis {
  * Pipe listener
  */
 template <typename DataType>
-struct FdListener : Listener<FdListener<DataType>> {
+class FdListener : public Listener<DataType> {
  public:
+  using typename Listener<DataType>::Callback;
   FdListener(int fd) : fd(fd) {}
 
   FdListener(int fd, std::function<bool(DataType&&)>& on_data)
       : fd(fd), on_data(on_data) {}
 
-  template <typename Callback>
-  void SetCallback(const Callback& on_data) {
-    this->on_data = on_data;
-  }
+  void SetCallback(const Callback& on_data) { this->on_data = on_data; }
 
   void Start() {
     worker = std::async(std::launch::async, [this] {
@@ -84,7 +82,9 @@ struct FdListener : Listener<FdListener<DataType>> {
 /**
  * Lightweight wrapper to handle comm.
  */
-struct FdWriter : Writer<FdWriter> {
+
+class FdWriter : public Writer {
+ public:
   inline FdWriter(int fd)
       : fd(fd),
         fds{fd, boost::iostreams::file_descriptor_flags::never_close_handle},

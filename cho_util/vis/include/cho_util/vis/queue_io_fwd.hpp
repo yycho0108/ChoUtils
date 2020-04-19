@@ -6,13 +6,13 @@ namespace cho_util {
 namespace vis {
 
 template <typename T>
-struct QueueListener;
+class QueueListener;
 
 template <typename T>
 using QueueListenerPtr = std::shared_ptr<QueueListener<T>>;
 
 template <typename T>
-struct QueueWriter;
+class QueueWriter;
 
 template <typename T>
 using QueueWriterPtr = std::shared_ptr<QueueWriter<T>>;

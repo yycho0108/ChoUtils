@@ -4,17 +4,14 @@
 namespace cho_util {
 namespace vis {
 
-template <typename Derived>
 struct Writer;
+using WriterPtr = std::shared_ptr<Writer>;
 
-template <typename Derived>
-using WriterPtr = std::shared_ptr<Writer<Derived>>;
-
-template <typename Derived>
+template <typename DataType>
 struct Listener;
 
-template <typename Derived>
-using ListenerPtr = std::shared_ptr<Listener<Derived>>;
+template <typename DataType>
+using ListenerPtr = std::shared_ptr<Listener<DataType>>;
 
 }  // namespace vis
 }  // namespace cho_util

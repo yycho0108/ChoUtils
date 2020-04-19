@@ -2,41 +2,30 @@
 
 #include "cho_util/vis/io_fwd.hpp"
 
+#include <functional>
+
 namespace cho_util {
 namespace vis {
 
-template <typename Derived>
+template <typename DataType>
 struct Listener {
-  Listener() {}
-  ~Listener() {}
+  using Callback = std::function<bool(DataType&&)>;
+  Listener(){}
+  virtual ~Listener() {}
 
-  template <typename Callback>
-  inline void SetCallback(const Callback& on_data) {
-    static_cast<Derived*>(this)->SetCallback(on_data);
-  }
+  virtual void SetCallback(const Callback& on_data) = 0;
+  bool OnData(DataType&& data);
 
-  template <typename DataType>
-  inline bool OnData(DataType&& data) const {
-    return static_cast<Derived*>(this)->OnData(data);
-  }
-
-  inline bool IsRunning() const {
-    return static_cast<const Derived*>(this)->IsRunning();
-  }
-
-  inline void Start() { static_cast<Derived*>(this)->Start(); }
-  inline void Stop() { static_cast<Derived*>(this)->Stop(); }
+  virtual bool IsRunning() const;
+  virtual void Start();
+  virtual void Stop();
 };
 
-template <typename Derived>
 struct Writer {
-  Writer() {}
-  virtual ~Writer() {}
-
-  template <typename T>
-  inline bool Send(const T& data, const bool flush = true) {
-    static_cast<Derived*>(this)->Send(data, flush);
-  }
+  Writer(){}
+  virtual ~Writer(){}
+  template <typename DataType>
+  bool Send(const DataType& data, const bool flush = true);
 };
 }  // namespace vis
 }  // namespace cho_util

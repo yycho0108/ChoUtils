@@ -45,7 +45,7 @@ class SubprocessViewer {
   void Spin();
 
  private:
-  VtkViewerPtr<FdListenerPtr<RenderData>, FdWriterPtr> viewer_;
+  VtkViewerPtr viewer_;
   Subprocess proc;
   FdWriterPtr data_writer_;
   // FdListenerPtr<EventData> event_listener_;

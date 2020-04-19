@@ -26,7 +26,7 @@ void SubprocessViewer::StartServer() {
   FdWriterPtr writer = std::make_shared<FdWriter>(proc.GetWriteFd());
   FdListenerPtr<RenderData> listener =
       std::make_shared<FdListener<RenderData>>(proc.GetReadFd());
-  viewer_ = std::make_shared<VtkViewer<FdListenerPtr<RenderData>, FdWriterPtr>>(
+  viewer_ = std::make_shared<VtkViewer>(
       listener, writer, true);
 }
 

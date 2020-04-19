@@ -32,8 +32,7 @@ void DirectViewer::StartServer() {
       std::make_shared<QueueWriter<RenderData>>(event_queue_);
   QueueListenerPtr<RenderData> data_listener =
       std::make_shared<QueueListener<RenderData>>(data_queue_);
-  viewer_ = std::make_shared<
-      VtkViewer<QueueListenerPtr<RenderData>, QueueWriterPtr<RenderData>>>(
+  viewer_ = std::make_shared<VtkViewer>(
       data_listener, event_writer, true, false);
 }
 

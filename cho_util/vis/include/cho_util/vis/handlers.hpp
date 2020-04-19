@@ -45,32 +45,6 @@ struct Handler {
       update;
 };
 
-static Handler sphere_handler{
-    .create = [](const RenderData& rd) -> vtkSmartPointer<vtkActor> {
-      auto src = vtkNew<vtkSphereSource>();
-      src->SetCenter(rd.data[0], rd.data[1], rd.data[2]);
-      src->SetRadius(rd.data[3]);
-
-      // non-exposed parameters
-      src->SetPhiResolution(64);
-      src->SetThetaResolution(64);
-
-      auto mapper = vtkNew<vtkPolyDataMapper>();
-      mapper->SetInputConnection(src->GetOutputPort());
-
-      auto actor = vtkNew<vtkActor>();
-      actor->SetMapper(mapper);
-      return actor;
-    },
-    .update = [](const vtkSmartPointer<vtkActor>& actor,
-                 const RenderData& rd) -> void {
-      vtkSmartPointer<vtkAlgorithm> alg =
-          actor->GetMapper()->GetInputConnection(0, 0)->GetProducer();
-      auto src = vtkSphereSource::SafeDownCast(alg);
-      src->SetCenter(rd.data[0], rd.data[1], rd.data[2]);
-      src->SetRadius(rd.data[3]);
-    }};
-
 /**
  * Get a cloud actor for {size x 3} row-major data.
  */

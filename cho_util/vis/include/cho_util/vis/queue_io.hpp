@@ -15,7 +15,7 @@ namespace vis {
  * Pipe listener
  */
 template <typename DataType>
-struct QueueListener : Listener<QueueListener<DataType>> {
+class QueueListener : public Listener<DataType> {
  private:
   std::shared_ptr<thread_safe_queue<DataType>> queue;
   bool quit{false};
@@ -30,8 +30,7 @@ struct QueueListener : Listener<QueueListener<DataType>> {
                 std::function<bool(DataType&&)>& on_data)
       : queue(queue), on_data(on_data) {}
 
-  template <typename Callback>
-  void SetCallback(const Callback& on_data) {
+  void SetCallback(const typename Listener<DataType>::Callback& on_data) {
     this->on_data = on_data;
   }
 
@@ -73,7 +72,7 @@ struct QueueListener : Listener<QueueListener<DataType>> {
  * Lightweight wrapper to handle comm.
  */
 template <typename DataType>
-struct QueueWriter : Writer<QueueWriter<DataType>> {
+class QueueWriter : public Writer {
  private:
   std::shared_ptr<thread_safe_queue<DataType>> queue;
 

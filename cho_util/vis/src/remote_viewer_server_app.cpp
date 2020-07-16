@@ -3,5 +3,5 @@
 
 int main(const int argc, const char* argv[]) {
   cho_util::vis::RemoteViewerServer server{true};
-  return 0;
+  return EXIT_SUCCESS;
 }

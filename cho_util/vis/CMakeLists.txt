@@ -93,10 +93,6 @@ target_include_directories(
 target_link_libraries(cho_util_vis PRIVATE fmt Boost::iostreams
                                            Boost::serialization)
 
-# Vis depends on a couple other stuff
-add_dependencies(cho_util_vis ChoUtil::core)
-add_dependencies(cho_util_vis vtk_viewer grpc_remote_viewer)
-
 # Adding this alias is only useful internally.
 add_library(${PROJECT_NAME}::vis ALIAS cho_util_vis)
 target_link_libraries(cho_util_vis PUBLIC ChoUtil::core ChoUtil::vtk_viewer

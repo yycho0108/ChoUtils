@@ -80,7 +80,8 @@ class QueueWriter : public Writer {
   inline QueueWriter(const std::shared_ptr<thread_safe_queue<DataType>>& queue)
       : queue(queue){};
 
-  template <typename T>
+  template <typename T,
+            typename std::enable_if_t<std::is_same<T, DataType>::value>>
   bool Send(const T& data, const bool flush = true) {
     queue->emplace(data);
     if (flush) {

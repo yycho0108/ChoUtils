@@ -1,4 +1,9 @@
-add_library(cho_util_util src/timer.cpp)
+add_library(cho_util_util
+    include/cho_util/util/timer.hpp
+    include/cho_util/util/profiler.hpp
+    src/timer.cpp
+    src/profiler.cpp
+    )
 set_target_properties(cho_util_util PROPERTIES EXPORT_NAME util)
 
 target_include_directories(

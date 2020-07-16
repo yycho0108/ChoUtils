@@ -81,7 +81,7 @@ class QueueWriter : public Writer {
       : queue(queue){};
 
   template <typename T,
-            typename std::enable_if_t<std::is_same<T, DataType>::value>>
+            typename=std::enable_if_t<std::is_same<T, DataType>::value>>
   bool Send(const T& data, const bool flush = true) {
     queue->emplace(data);
     if (flush) {

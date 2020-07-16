@@ -2,7 +2,7 @@
 
 #include <memory>
 
-namespace cho_util {
+namespace cho {
 namespace vis {
 
 template <typename T>
@@ -15,4 +15,4 @@ class FdWriter;
 using FdWriterPtr = std::shared_ptr<FdWriter>;
 
 }  // namespace vis
-}  // namespace cho_util
+}  // namespace cho

@@ -4,7 +4,7 @@
 #include "cho_util/vis/render_data.hpp"
 #include "cho_util/vis/vtk_viewer.hpp"
 
-namespace cho_util {
+namespace cho {
 namespace vis {
 
 DirectViewer::DirectViewer(const bool start)
@@ -49,4 +49,4 @@ void DirectViewer::Render(const RenderData& data) {
 void DirectViewer::Spin() { viewer_->Spin(); }
 
 }  // namespace vis
-}  // namespace cho_util
+}  // namespace cho

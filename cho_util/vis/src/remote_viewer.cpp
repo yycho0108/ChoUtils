@@ -9,7 +9,7 @@
 
 #include "cho_util/vis/render_data.hpp"
 
-namespace cho_util {
+namespace cho {
 namespace vis {
 
 // App runners
@@ -42,4 +42,4 @@ void RemoteViewerClient::Render(const RenderData& data) {
 }
 void RemoteViewerClient::Spin() { std::promise<void>().get_future().wait(); }
 }  // namespace vis
-}  // namespace cho_util
+}  // namespace cho

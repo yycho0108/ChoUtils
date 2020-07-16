@@ -2,7 +2,7 @@
 
 #include <random>
 
-namespace cho_util {
+namespace cho {
 namespace core {
 
 struct RNG {
@@ -27,4 +27,4 @@ struct RNG {
 };
 
 }  // namespace core
-}  // namespace cho_util
+}  // namespace cho

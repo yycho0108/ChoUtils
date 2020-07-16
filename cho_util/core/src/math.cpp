@@ -1,6 +1,6 @@
 #include "cho_util/core/math.hpp"
 
-namespace cho_util {
+namespace cho {
 namespace core {
 
 void Linspace(const float min, const float max, const int size,
@@ -21,4 +21,4 @@ std::vector<float> Linspace(const float min, const float max, const int size) {
   return out;
 }
 }  // namespace core
-}  // namespace cho_util
+}  // namespace cho

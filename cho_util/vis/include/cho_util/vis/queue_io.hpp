@@ -8,7 +8,7 @@
 #include "cho_util/core/thread_safe_queue.hpp"
 #include "cho_util/vis/io.hpp"
 
-namespace cho_util {
+namespace cho {
 namespace vis {
 
 /**
@@ -91,4 +91,4 @@ class QueueWriter : public Writer {
 };
 
 }  // namespace vis
-}  // namespace cho_util
+}  // namespace cho

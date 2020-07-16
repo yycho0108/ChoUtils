@@ -37,12 +37,12 @@
 #include "cho_util/vis/handlers.hpp"
 #include "cho_util/vis/render_data.hpp"
 
-namespace cho_util {
+namespace cho {
 namespace vis {
 
 class VtkViewer::Impl {
-  using ListenerPtr = cho_util::vis::ListenerPtr<RenderData>;
-  using WriterPtr = cho_util::vis::WriterPtr;
+  using ListenerPtr = cho::vis::ListenerPtr<RenderData>;
+  using WriterPtr = cho::vis::WriterPtr;
 
  private:
   // I/O
@@ -217,7 +217,7 @@ bool VtkViewer::Impl::OnData(RenderData&& data) {
   if (create) {
     // Create
     const auto& data = rmap[tag];
-    auto actor = cho_util::vis::Render(colors, data);
+    auto actor = cho::vis::Render(colors, data);
     if (!actor) {
       auto it = handlers_.find(data.render_type);
       if (it != handlers_.end()) {
@@ -237,7 +237,7 @@ bool VtkViewer::Impl::OnData(RenderData&& data) {
     if (it != handlers_.end()) {
       it->second->update(amap[data.tag], data);
     } else {
-      cho_util::vis::Update(amap[data.tag], data);
+      cho::vis::Update(amap[data.tag], data);
     }
   }
 
@@ -339,4 +339,4 @@ void VtkViewer::Impl::Spin() {
   }
 }
 }  // namespace vis
-}  // namespace cho_util
+}  // namespace cho

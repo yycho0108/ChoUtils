@@ -15,7 +15,7 @@
 
 #include "cho_util/vis/io.hpp"
 
-namespace cho_util {
+namespace cho {
 namespace vis {
 
 /**
@@ -107,4 +107,4 @@ class FdWriter : public Writer {
 };
 
 }  // namespace vis
-}  // namespace cho_util
+}  // namespace cho

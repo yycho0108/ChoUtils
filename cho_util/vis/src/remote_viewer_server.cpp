@@ -14,7 +14,7 @@
 // Generated Protobufs
 #include "cho_util/proto/render.grpc.pb.h"
 
-namespace cho_util {
+namespace cho {
 namespace vis {
 
 using grpc::Server;
@@ -245,4 +245,4 @@ void RenderServer<DataType>::HandleRpcs() {
 template class RenderServer<RenderData>;
 
 }  // namespace vis
-}  // namespace cho_util
+}  // namespace cho

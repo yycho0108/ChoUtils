@@ -1,6 +1,6 @@
 #include "cho_util/core/random.hpp"
 
-namespace cho_util {
+namespace cho {
 namespace core {
 
 float RNG::Randn() { return ndist(generator); }
@@ -16,4 +16,4 @@ float RNG::Normal(float mean, float scale) { return mean + scale * Randn(); }
 void RNG::SetSeed(const std::size_t seed) { generator.seed(seed); }
 
 }  // namespace core
-}  // namespace cho_util
+}  // namespace cho

@@ -30,7 +30,7 @@
 
 #include "cho_util/vis/render_data.hpp"
 
-namespace cho_util {
+namespace cho {
 namespace vis {
 
 vtkSmartPointer<vtkActor> GetCylinderActor(
@@ -183,4 +183,4 @@ void Update(const vtkSmartPointer<vtkActor>& actor, const RenderData& data) {
   }
 }
 }  // namespace vis
-}  // namespace cho_util
+}  // namespace cho

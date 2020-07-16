@@ -7,7 +7,7 @@
 
 #include "cho_util/util/timer.hpp"
 
-namespace cho_util {
+namespace cho {
 namespace util {
 
 class Profiler {
@@ -27,4 +27,4 @@ class Profiler {
 };
 
 }  // namespace util
-}  // namespace cho_util
+}  // namespace cho

@@ -2,6 +2,6 @@
 #include "cho_util/vis/remote_viewer_server.hpp"
 
 int main(const int argc, const char* argv[]) {
-  cho_util::vis::RemoteViewerServer server{true};
+  cho::vis::RemoteViewerServer server{true};
   return EXIT_SUCCESS;
 }

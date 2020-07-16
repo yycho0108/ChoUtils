@@ -3,7 +3,7 @@
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/vector.hpp>
 
-namespace cho_util {
+namespace cho {
 namespace vis {
 
 struct EventData {
@@ -15,4 +15,4 @@ struct EventData {
   int dummy;
 };
 }  // namespace vis
-}  // namespace cho_util
+}  // namespace cho

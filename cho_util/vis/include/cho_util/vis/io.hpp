@@ -4,7 +4,7 @@
 
 #include <functional>
 
-namespace cho_util {
+namespace cho {
 namespace vis {
 
 template <typename DataType>
@@ -28,4 +28,4 @@ struct Writer {
   bool Send(const DataType& data, const bool flush = true);
 };
 }  // namespace vis
-}  // namespace cho_util
+}  // namespace cho

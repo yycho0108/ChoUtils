@@ -34,7 +34,7 @@
 
 #include "cho_util/vis/render_data.hpp"
 
-namespace cho_util {
+namespace cho {
 namespace vis {
 /**
  * Handler for actor creation + update.
@@ -200,4 +200,4 @@ vtkSmartPointer<vtkActor> Render(vtkSmartPointer<vtkNamedColors>& colors,
 
 void Update(const vtkSmartPointer<vtkActor>& actor, const RenderData& data);
 }  // namespace vis
-}  // namespace cho_util
+}  // namespace cho

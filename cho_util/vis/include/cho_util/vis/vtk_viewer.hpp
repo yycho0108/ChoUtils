@@ -9,7 +9,7 @@
 #include "cho_util/vis/io.hpp"
 #include "cho_util/vis/render_data.hpp"
 
-namespace cho_util {
+namespace cho {
 namespace vis {
 
 class VtkViewer {
@@ -17,8 +17,8 @@ class VtkViewer {
   class Impl;
   std::unique_ptr<Impl> impl_;
 
-  using ListenerPtr = cho_util::vis::ListenerPtr<RenderData>;
-  using WriterPtr = cho_util::vis::WriterPtr;
+  using ListenerPtr = cho::vis::ListenerPtr<RenderData>;
+  using WriterPtr = cho::vis::WriterPtr;
 
  public:
   VtkViewer(const ListenerPtr listener, const WriterPtr writer,
@@ -43,4 +43,4 @@ class VtkViewer {
 };
 
 }  // namespace vis
-}  // namespace cho_util
+}  // namespace cho

@@ -2,7 +2,7 @@
 
 #include <memory>
 
-namespace cho_util {
+namespace cho {
 namespace vis {
 
 template <typename T>
@@ -18,4 +18,4 @@ template <typename T>
 using QueueWriterPtr = std::shared_ptr<QueueWriter<T>>;
 
 }  // namespace vis
-}  // namespace cho_util
+}  // namespace cho

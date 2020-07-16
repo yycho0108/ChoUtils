@@ -2,7 +2,7 @@
 
 #include <chrono>
 
-namespace cho_util {
+namespace cho {
 namespace util {
 
 template <typename Duration = std::chrono::duration<double, std::milli>>
@@ -45,4 +45,4 @@ using MTimer = Timer<std::chrono::duration<double, std::milli>>;
 using UTimer = Timer<std::chrono::duration<double, std::micro>>;
 
 }  // namespace util
-}  // namespace cho_util
+}  // namespace cho

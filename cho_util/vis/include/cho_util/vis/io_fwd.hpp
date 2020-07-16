@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-namespace cho_util {
+namespace cho {
 namespace vis {
 
 struct Writer;
@@ -14,4 +14,4 @@ template <typename DataType>
 using ListenerPtr = std::shared_ptr<Listener<DataType>>;
 
 }  // namespace vis
-}  // namespace cho_util
+}  // namespace cho

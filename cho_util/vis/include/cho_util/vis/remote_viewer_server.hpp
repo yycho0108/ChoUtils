@@ -31,7 +31,7 @@ using grpc::ClientContext;
 using grpc::CompletionQueue;
 using grpc::Status;
 
-namespace cho_util {
+namespace cho {
 namespace vis {
 
 template <typename DataType>
@@ -104,4 +104,4 @@ class RenderServer : public Listener<DataType> {
 };
 
 }  // namespace vis
-}  // namespace cho_util
+}  // namespace cho

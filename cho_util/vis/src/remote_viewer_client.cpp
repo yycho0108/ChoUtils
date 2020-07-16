@@ -23,7 +23,7 @@ using render::Renderer;
 using render::RenderReply;
 using render::RenderRequest;
 
-namespace cho_util {
+namespace cho {
 namespace vis {
 
 void Convert(const RenderData& rd, RenderRequest* const req) {
@@ -211,4 +211,4 @@ void RenderClient::Render(const RenderData& rd) {
 }
 
 }  // namespace vis
-}  // namespace cho_util
+}  // namespace cho

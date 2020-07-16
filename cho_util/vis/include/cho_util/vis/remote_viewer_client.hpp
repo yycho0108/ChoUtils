@@ -7,7 +7,7 @@
 
 #include "cho_util/proto/render.grpc.pb.h"
 
-namespace cho_util {
+namespace cho {
 namespace vis {
 
 class RenderClient {
@@ -22,4 +22,4 @@ class RenderClient {
   std::unique_ptr<render::Renderer::Stub> stub_;
 };
 }  // namespace vis
-}  // namespace cho_util
+}  // namespace cho

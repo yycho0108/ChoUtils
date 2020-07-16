@@ -3,7 +3,7 @@
 #include <fstream>
 #include <iostream>
 
-namespace cho_util {
+namespace cho {
 namespace util {
 
 void Profiler::Start(const std::string& tag) {
@@ -30,4 +30,4 @@ void Profiler::Save(const std::string& filename) const {
 }
 
 }  // namespace util
-}  // namespace cho_util
+}  // namespace cho

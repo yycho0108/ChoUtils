@@ -5,7 +5,7 @@
 #include "cho_util/vis/subprocess.hpp"
 #include "cho_util/vis/vtk_viewer.hpp"
 
-namespace cho_util {
+namespace cho {
 namespace vis {
 
 void SubprocessViewer::Start() {
@@ -54,4 +54,4 @@ void SubprocessViewer::Spin() {
 }
 
 }  // namespace vis
-}  // namespace cho_util
+}  // namespace cho

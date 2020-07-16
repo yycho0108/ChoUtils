@@ -2,7 +2,7 @@
 
 #include <vector>
 
-namespace cho_util {
+namespace cho {
 namespace core {
 
 void Linspace(const float min, const float max, const int size,
@@ -11,4 +11,4 @@ void Linspace(const float min, const float max, const int size,
 std::vector<float> Linspace(const float min, const float max, const int size);
 
 }  // namespace core
-}  // namespace cho_util
+}  // namespace cho

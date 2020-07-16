@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <csignal>
 
-namespace cho_util {
+namespace cho {
 namespace vis {
 
 void Subprocess::Start() {
@@ -40,4 +40,4 @@ void Subprocess::Stop() {
 }
 
 }  // namespace vis
-}  // namespace cho_util
+}  // namespace cho

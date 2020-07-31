@@ -11,9 +11,9 @@ int main()
     std::cout << CU_VERSION_MINOR << std::endl;
     std::cout << CU_VERSION_PATCH << std::endl;
 
-    cho_util::util::MTimer timer{ true };
-    cho_util::core::RNG rng;
-    const std::vector<float> times = cho_util::core::Linspace(0, 100, 100);
+    cho::util::MTimer timer{ true };
+    cho::core::RNG rng;
+    const std::vector<float> times = cho::core::Linspace(0, 100, 100);
     for (const auto& x : times) {
         std::cout << x << std::endl;
     }

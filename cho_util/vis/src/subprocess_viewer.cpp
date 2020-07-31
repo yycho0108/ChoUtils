@@ -1,3 +1,5 @@
+#include "cho_util/core/geometry/geometry_base.hpp"
+
 #include "cho_util/vis/subprocess_viewer.hpp"
 
 #include "cho_util/vis/pipe_io.hpp"
@@ -26,8 +28,7 @@ void SubprocessViewer::StartServer() {
   FdWriterPtr writer = std::make_shared<FdWriter>(proc.GetWriteFd());
   FdListenerPtr<RenderData> listener =
       std::make_shared<FdListener<RenderData>>(proc.GetReadFd());
-  viewer_ = std::make_shared<VtkViewer>(
-      listener, writer, true);
+  viewer_ = std::make_shared<VtkViewer>(listener, writer, true);
 }
 
 void SubprocessViewer::Render(const RenderData& data) {

@@ -1,5 +1,9 @@
 syntax = "proto3";
 
+// TODO(yycho0108): Consider promoting to a higher level package
+// once geometry is used elsewhere.
+package cho.proto.vis.geometry;
+
 message Vector3f {
   float x = 1;
   float y = 2;
@@ -10,6 +14,7 @@ message Color {
   float r = 1;
   float g = 2;
   float b = 3;
+  float a = 4;  // opacity
 }
 
 message Colors {
@@ -58,4 +63,11 @@ message Cuboid {
 message Sphere {
   Vector3f center = 1;
   float radius = 2;
+}
+
+message Cylinder {
+  Vector3f center = 1;
+  float radius = 2;
+  float height = 3;
+  // int resolution = 4;
 }

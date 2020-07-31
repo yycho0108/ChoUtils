@@ -8,11 +8,9 @@
 #include <grpc/support/log.h>
 #include <grpcpp/grpcpp.h>
 
+#include "cho_util/proto/render.grpc.pb.h"
 #include "cho_util/vis/io.hpp"
 #include "cho_util/vis/render_data.hpp"
-
-// Generated Protobufs
-#include "cho_util/proto/render.grpc.pb.h"
 
 using grpc::Server;
 using grpc::ServerAsyncResponseWriter;
@@ -20,10 +18,6 @@ using grpc::ServerBuilder;
 using grpc::ServerCompletionQueue;
 using grpc::ServerContext;
 using grpc::Status;
-
-using render::Renderer;
-using render::RenderReply;
-using render::RenderRequest;
 
 using grpc::Channel;
 using grpc::ClientAsyncResponseReader;
@@ -33,6 +27,10 @@ using grpc::Status;
 
 namespace cho {
 namespace vis {
+
+using cho::proto::vis::render::Renderer;
+using cho::proto::vis::render::RenderReply;
+using cho::proto::vis::render::RenderRequest;
 
 template <typename DataType>
 class RenderServer : public Listener<DataType> {

@@ -1,5 +1,6 @@
 #include "cho_util/vis/handlers.hpp"
 
+#include <memory>
 #include <string>
 
 #include <fmt/format.h>
@@ -28,6 +29,8 @@
 #include <vtkUnsignedCharArray.h>
 #include <vtkVertexGlyphFilter.h>
 
+#include "cho_util/core/geometry/plane.hpp"
+#include "cho_util/core/geometry/point_cloud.hpp"
 #include "cho_util/vis/render_data.hpp"
 
 namespace cho {
@@ -40,6 +43,8 @@ vtkSmartPointer<vtkActor> GetCylinderActor(
   vtkSmartPointer<vtkCylinderSource> cylinder =
       vtkSmartPointer<vtkCylinderSource>::New();
   cylinder->SetResolution(8);
+
+  // Filter -> polydata
 
   // The mapper is responsible for pushing the geometry into the graphics
   // library. It may also do color mapping, if scalars or other attributes are
@@ -60,25 +65,33 @@ vtkSmartPointer<vtkActor> GetCylinderActor(
 
 vtkSmartPointer<vtkActor> Render(vtkSmartPointer<vtkNamedColors>& colors,
                                  const RenderData& data) {
-  if (data.data.empty()) {
+  if (!data.geometry) {
     return nullptr;
   }
 
   switch (data.render_type) {
-    case RenderData::RenderType::kNone: {
+    case RenderType::kNone: {
       return nullptr;
       break;
     }
-    case RenderData::RenderType::kPoints: {
-      return GetCloudActor(&data.data[0], data.data.size() / 3);
+    case RenderType::kPoints: {
+      return GetCloudActor(data.geometry->GetPtr(),
+                           data.geometry->GetSize() / 3);
       break;
     }
-    case RenderData::RenderType::kPlane: {
-      return GetPlaneActor(colors, &data.data[0], &data.data[3]);
+    case RenderType::kPlane: {
+      return GetPlaneActor(colors, data.geometry->GetPtr(),
+                           data.geometry->GetPtr() + 3);
       break;
     }
-    case RenderData::RenderType::kBox: {
-      return GetBboxActor(colors, &data.data[0], &data.data[3],
+    case RenderType::kBox: {
+      fmt::print("BOX\n");
+      // return GetBboxActor(colors, data.geometry->GetPtr(),
+      auto geo = std::dynamic_pointer_cast<const core::Cuboid<float, 3> >(
+          data.geometry);
+      const Eigen::Vector3f bmin = geo->GetMin();
+      const Eigen::Vector3f bmax = geo->GetMax();
+      return GetBboxActor(colors, &bmin(0), &bmax(0),
                           data.color.empty() ? nullptr : data.color.data(),
                           data.representation);
       break;
@@ -93,10 +106,10 @@ vtkSmartPointer<vtkActor> Render(vtkSmartPointer<vtkNamedColors>& colors,
 
 void Update(const vtkSmartPointer<vtkActor>& actor, const RenderData& data) {
   switch (data.render_type) {
-    case RenderData::RenderType::kNone: {
+    case RenderType::kNone: {
       break;
     }
-    case RenderData::RenderType::kPoints: {
+    case RenderType::kPoints: {
 #if 0
       // Update!
       vtkSmartPointer<vtkAlgorithm> alg =
@@ -121,7 +134,9 @@ void Update(const vtkSmartPointer<vtkActor>& actor, const RenderData& data) {
       vertex->SetInputData(poly);
       vertex->Update();
 #else
-      const int size = (data.data.size() / 3);
+      auto geo = std::dynamic_pointer_cast<const core::PointCloud<float, 3> >(
+          data.geometry);
+      const int size = geo->GetNumPoints();
 
       vtkSmartPointer<vtkAlgorithm> alg =
           actor->GetMapper()->GetInputConnection(0, 0)->GetProducer();
@@ -131,7 +146,8 @@ void Update(const vtkSmartPointer<vtkActor>& actor, const RenderData& data) {
       src->Resize(size);
       src->SetNumberOfPoints(size);
       for (int i = 0; i < size; ++i) {
-        auto p = &data.data[i * 3];
+        const auto& p = geo->GetData().col(i);
+        ;
         src->SetPoint(i, p[0], p[1], p[2]);
       }
       src->GetPoints()->Modified();
@@ -150,7 +166,8 @@ void Update(const vtkSmartPointer<vtkActor>& actor, const RenderData& data) {
         colors->SetNumberOfTuples(size);
         double color[3];
         for (int i = 0; i < size; ++i) {
-          colorLut->GetColor(0.2 * data.data[i * 3], color);
+          const auto& p = geo->GetData().col(i);
+          colorLut->GetColor(0.2 * p.z(), color);
           for (auto& c : color) {
             c *= 255.0f;
           }
@@ -162,21 +179,34 @@ void Update(const vtkSmartPointer<vtkActor>& actor, const RenderData& data) {
 #endif
       break;
     }
-    case RenderData::RenderType::kPlane: {
+    case RenderType::kPlane: {
+      auto geo = std::dynamic_pointer_cast<const core::Plane<float, 3> >(
+          data.geometry);
+      const auto& center = geo->GetCenter();
+      const auto& normal = geo->GetNormal();
+
       vtkSmartPointer<vtkAlgorithm> alg =
           actor->GetMapper()->GetInputConnection(0, 0)->GetProducer();
       vtkSmartPointer<vtkPlaneSource> plane = vtkPlaneSource::SafeDownCast(alg);
-      plane->SetCenter(data.data[0], data.data[1], data.data[2]);
-      plane->SetNormal(data.data[3], data.data[4], data.data[5]);
+      plane->SetCenter(center.x(), center.y(), center.z());
+      plane->SetNormal(normal.x(), normal.y(), normal.z());
       plane->Update();
       break;
     }
-    case RenderData::RenderType::kBox: {
+    case RenderType::kCuboid: {
+      auto geo = std::dynamic_pointer_cast<const core::Cuboid<float, 3> >(
+          data.geometry);
+
+      const auto& bmin = geo->GetMin();
+      const auto& bmax = geo->GetMax();
+      fmt::print("min {} {} {}\n", bmin.x(), bmin.y(), bmin.z());
+      fmt::print("max {} {} {}\n", bmax.x(), bmax.y(), bmax.z());
+
       vtkSmartPointer<vtkAlgorithm> alg =
           actor->GetMapper()->GetInputConnection(0, 0)->GetProducer();
       vtkSmartPointer<vtkCubeSource> bbox = vtkCubeSource::SafeDownCast(alg);
-      bbox->SetBounds(data.data[0], data.data[3], data.data[1], data.data[4],
-                      data.data[2], data.data[5]);
+      bbox->SetBounds(bmin.x(), bmax.x(), bmin.y(), bmax.y(), bmin.z(),
+                      bmax.z());
       bbox->Update();
       break;
     }

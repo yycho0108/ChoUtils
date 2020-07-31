@@ -10,20 +10,20 @@ namespace vis {
 template <typename DataType>
 struct Listener {
   using Callback = std::function<bool(DataType&&)>;
-  Listener(){}
+  Listener() {}
   virtual ~Listener() {}
 
   virtual void SetCallback(const Callback& on_data) = 0;
-  bool OnData(DataType&& data);
+  virtual bool OnData(DataType&& data) const = 0;
 
-  virtual bool IsRunning() const;
-  virtual void Start();
-  virtual void Stop();
+  virtual bool IsRunning() const = 0;
+  virtual void Start() = 0;
+  virtual void Stop() = 0;
 };
 
 struct Writer {
-  Writer(){}
-  virtual ~Writer(){}
+  Writer() {}
+  virtual ~Writer() {}
   template <typename DataType>
   bool Send(const DataType& data, const bool flush = true);
 };

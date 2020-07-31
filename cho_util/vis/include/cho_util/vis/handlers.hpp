@@ -36,6 +36,56 @@
 
 namespace cho {
 namespace vis {
+
+template <typename Derived>
+class BaseHandler : public AbstractHandler {
+ private:
+  BaseHandler() = default;
+  BaseHandler(const BaseHandler&) = default;
+  friend Derived;
+
+ public:
+  virtual void Create(const RenderData& data) {
+    return static_cast<Derived*>(this)->CreateImpl(data);
+  }
+  virtual void Update(const RenderData& data) {
+    return static_cast<Derived*>(this)->UpdateImpl(data);
+  }
+};
+
+class CylinderHandler : public BaseHandler<CylinderHandler> {
+ public:
+  using Ptr = std::shared_ptr<CylinderHandler>;
+
+  void CreateImpl(const RenderData& data) {
+    auto colors = vtkSmartPointer<vtkNamedColors>::New();
+    source_ = vtkSmartPointer<vtkCylinderSource>::New();
+    mapper_ = vtkSmartPointer<vtkPolyDataMapper>::New();
+    actor_ = vtkSmartPointer<vtkActor>::New();
+
+    mapper_->SetInputConnection(source_->GetOutputPort());
+    actor_->SetMapper(mapper_);
+    actor_->GetProperty()->SetColor(colors->GetColor4d("Tomato").GetData());
+
+    // NOTE(yycho0108): Params.
+    source_->SetResolution(8);
+  }
+
+  void UpdateImpl(const RenderData& data) {
+    const auto& src =
+        std::dynamic_pointer_cast<core::Cylinder<float>>(data.geometry);
+    // source_->SetCenter(src.);
+    // source_->SetHeight(data.data[3]);
+    // source_->SetRadius(data.data[4]);
+    // source_->Update();
+  }
+
+ private:
+  vtkSmartPointer<vtkCylinderSource> source_;
+  vtkSmartPointer<vtkPolyDataMapper> mapper_;
+  vtkSmartPointer<vtkActor> actor_;
+};
+
 /**
  * Handler for actor creation + update.
  */

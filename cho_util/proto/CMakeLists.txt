@@ -20,8 +20,9 @@ message("Gen ${ProtoGrpcSources} ${ProtoGrpcHeaders}")
 add_library(cho_util_proto SHARED ${ProtoGrpcSources} ${ProtoGrpcHeaders})
 set_target_properties(cho_util_proto PROPERTIES EXPORT_NAME proto)
 
-target_link_libraries(cho_util_proto PUBLIC ${_REFLECTION} ${_GRPC_GRPCPP}
-                                            ${_PROTOBUF_LIBPROTOBUF})
+target_link_libraries(
+  cho_util_proto PUBLIC ${_REFLECTION} ${_PROTOBUF_LIBPROTOBUF}
+                        ${_GRPC_GRPCPP})
 
 target_include_directories(
   cho_util_proto PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)

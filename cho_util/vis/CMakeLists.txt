@@ -1,5 +1,7 @@
 find_package(Boost REQUIRED COMPONENTS iostreams serialization)
+find_package(Eigen3 REQUIRED)
 find_package(fmt)
+
 find_package(
   VTK
   COMPONENTS vtkCommonColor
@@ -14,6 +16,15 @@ find_package(
              vtkRenderingGL2PSOpenGL2
              vtkRenderingOpenGL2
              QUIET)
+
+# Datatype Conversion for proto <-> geometry types
+add_library(vis_convert_proto SHARED include/cho_util/vis/convert_proto.hpp
+                                     src/convert_proto.cpp)
+target_link_libraries(vis_convert_proto PUBLIC ChoUtil::core)
+target_link_libraries(vis_convert_proto PUBLIC ChoUtil::type ChoUtil::proto)
+target_include_directories(
+  vis_convert_proto
+  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
 # Main viewer core
 add_library(
@@ -48,11 +59,14 @@ add_library(
   include/cho_util/vis/io.hpp
   include/cho_util/vis/queue_io.hpp
   include/cho_util/vis/render_data.hpp)
+
 target_include_directories(
   grpc_remote_viewer
   PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(grpc_remote_viewer PUBLIC ChoUtil::proto ChoUtil::core
-                                                ChoUtil::vtk_viewer)
+
+target_link_libraries(
+  grpc_remote_viewer PUBLIC ChoUtil::proto ChoUtil::core ChoUtil::vtk_viewer
+                            ChoUtil::type vis_convert_proto)
 add_library(${PROJECT_NAME}::grpc_remote_viewer ALIAS grpc_remote_viewer)
 
 # Grpc Remote Viewer App...
@@ -95,14 +109,15 @@ target_link_libraries(cho_util_vis PRIVATE fmt Boost::iostreams
 
 # Adding this alias is only useful internally.
 add_library(${PROJECT_NAME}::vis ALIAS cho_util_vis)
-target_link_libraries(cho_util_vis PUBLIC ChoUtil::core ChoUtil::vtk_viewer
-                                          ChoUtil::grpc_remote_viewer)
+target_link_libraries(
+  cho_util_vis PUBLIC ChoUtil::core ChoUtil::vtk_viewer ChoUtil::type
+                      ChoUtil::grpc_remote_viewer)
 
 generate_export_header(cho_util_vis)
 
 install(
   TARGETS cho_util_vis vtk_viewer grpc_remote_viewer
-          grpc_remote_viewer_server_app
+          grpc_remote_viewer_server_app vis_convert_proto
   EXPORT ${PROJECT_NAME}Targets
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 

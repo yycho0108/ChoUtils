@@ -17,6 +17,7 @@ namespace vis {
 
 template <typename DataType>
 class RenderServer;
+
 template <typename DataType>
 using RenderServerPtr = std::shared_ptr<RenderServer<DataType>>;
 

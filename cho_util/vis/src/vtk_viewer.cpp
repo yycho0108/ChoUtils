@@ -75,7 +75,7 @@ class VtkViewer::Impl {
                           std::unordered_map<int, HandlerPtr>* const handlers,
                           const int rtype = -1) {
     int rtype_{-1};
-    if (rtype >= RenderData::kUser) {
+    if (rtype >= RenderType::kUser) {
       // Use supplied id.
       if (handlers->find(rtype) != handlers->end()) {
         return -1;
@@ -153,7 +153,7 @@ std::vector<int> VtkViewer::Impl::GetAvailableHandlers(const int size) const {
   std::vector<int> out;
   out.reserve(size);
 
-  int index = RenderData::kUser;
+  int index = RenderType::kUser;
   while (out.size() < size) {
     if (handlers_.find(index) != handlers_.end()) {
       ++index;
@@ -176,20 +176,22 @@ void VtkViewer::Impl::RegisterDefaultHandlers() {
       vtkSmartPointer<vtkNamedColors>::New();
 
   // Example: custom plane
-  RegisterHandler(
-      Handler{[colors](const RenderData& rd) -> vtkSmartPointer<vtkActor> {
-                return GetPlaneActor(colors, &rd.data[0], &rd.data[3]);
-              },
-              [](const vtkSmartPointer<vtkActor>& actor, const RenderData& rd) {
-                vtkSmartPointer<vtkAlgorithm> alg =
-                    actor->GetMapper()->GetInputConnection(0, 0)->GetProducer();
-                vtkSmartPointer<vtkPlaneSource> plane =
-                    vtkPlaneSource::SafeDownCast(alg);
-                plane->SetCenter(rd.data[0], rd.data[1], rd.data[2]);
-                plane->SetNormal(rd.data[3], rd.data[4], rd.data[5]);
-                plane->Update();
-              }},
-      GetAvailableHandlers(1)[0]);
+  // RegisterHandler(
+  //    Handler{[colors](const RenderData& rd) -> vtkSmartPointer<vtkActor> {
+  //              return GetPlaneActor(colors, &rd.data[0], &rd.data[3]);
+  //            },
+  //            [](const vtkSmartPointer<vtkActor>& actor, const RenderData& rd)
+  //            {
+  //              vtkSmartPointer<vtkAlgorithm> alg =
+  //                  actor->GetMapper()->GetInputConnection(0,
+  //                  0)->GetProducer();
+  //              vtkSmartPointer<vtkPlaneSource> plane =
+  //                  vtkPlaneSource::SafeDownCast(alg);
+  //              plane->SetCenter(rd.data[0], rd.data[1], rd.data[2]);
+  //              plane->SetNormal(rd.data[3], rd.data[4], rd.data[5]);
+  //              plane->Update();
+  //            }},
+  //    GetAvailableHandlers(1)[0]);
 }
 
 bool VtkViewer::Impl::OnData(RenderData&& data) {

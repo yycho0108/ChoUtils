@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "geometry.proto";
 
-package render;
+package cho.proto.vis.render;
 
 // The greeting service definition.
 service Renderer {
@@ -15,12 +15,14 @@ enum RenderType {
   kNone = 0;
   kPoints = 1;
   kLines = 2;
-  // kLineLoop, kLineStrip, kTriangles ...
-  kPlane = 3;
+  kLinestrip = 3;
+  kLineloop = 4;
+  kTriangles = 5;
+  kPlane = 6;
 
   // higher-order geometries
-  kSphere = 4;
-  kCuboid = 5;
+  kSphere = 7;
+  kCuboid = 8;
 }
 
 enum RepresentationType {
@@ -36,15 +38,15 @@ message RenderRequest {
   RenderType type = 2;
   RepresentationType representation = 3;
   oneof color {
-    Color uniform = 4;
-    Colors each = 5;
+    geometry.Color uniform = 4;
+    geometry.Colors each = 5;
   }
   oneof data {
-    PointCloud cloud = 7;
-    Lines lines = 8;
-    Plane plane = 9;
-    Sphere sphere = 10;
-    Cuboid cuboid = 11;
+    geometry.PointCloud cloud = 7;
+    geometry.Lines lines = 8;
+    geometry.Plane plane = 9;
+    geometry.Sphere sphere = 10;
+    geometry.Cuboid cuboid = 11;
   }
   float opacity = 6;
 }

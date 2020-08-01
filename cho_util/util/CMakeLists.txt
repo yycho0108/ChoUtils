@@ -1,6 +1,7 @@
 add_library(cho_util_util
     include/cho_util/util/timer.hpp
     include/cho_util/util/profiler.hpp
+    include/cho_util/util/mp_utils.hpp
     src/timer.cpp
     src/profiler.cpp
     )

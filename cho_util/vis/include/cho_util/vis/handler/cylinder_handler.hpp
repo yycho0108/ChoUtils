@@ -37,6 +37,8 @@ class CylinderHandler : public HandlerBase<CylinderHandler> {
     // source_->Update();
     source_->Modified();
   }
+  vtkSmartPointer<vtkActor> GetActor() { return actor_; }
+  vtkSmartPointer<const vtkActor> GetActor() const { return actor_; }
 
  private:
   vtkSmartPointer<vtkCylinderSource> source_;

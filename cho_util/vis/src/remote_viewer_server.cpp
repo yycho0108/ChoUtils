@@ -29,7 +29,7 @@ using proto::vis::render::Renderer;
 using proto::vis::render::RenderReply;
 using proto::vis::render::RenderRequest;
 
-void AppendVector3f(const proto::vis::geometry::Vector3f& v,
+void AppendVector3f(const proto::core::geometry::Vector3f& v,
                     std::vector<float>* const data) {
   data->emplace_back(v.x());
   data->emplace_back(v.y());

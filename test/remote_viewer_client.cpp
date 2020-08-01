@@ -1,19 +1,18 @@
 #include <variant>
 
-#include <cho_util/core/geometry.hpp>
-#include <cho_util/vis/remote_viewer_client.hpp>
-#include <cho_util/vis/render_data.hpp>
+#include "cho_util/core/geometry.hpp"
 #include "cho_util/core/geometry/line.hpp"
 #include "cho_util/core/geometry/point_cloud.hpp"
 #include "cho_util/core/geometry/sphere.hpp"
-#include "cho_util/proto/render.pb.h"
 #include "cho_util/type/convert.hpp"
+#include "cho_util/vis/remote_viewer.hpp"
+#include "cho_util/vis/render_data.hpp"
 
 #include <fmt/printf.h>
 #include <unistd.h>
 
 int main() {
-  cho::vis::RenderClient viewer;
+  cho::vis::RemoteViewerClient viewer;
 
   cho::vis::RenderData cube{
       .render_type = cho::vis::RenderType::kCuboid,

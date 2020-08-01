@@ -34,7 +34,7 @@ class Cylinder : public GeometryBase<Cylinder<_Scalar>> {
 
  private:
   // [Center, Radius]
-  Eigen::Matrix<Scalar, 7, 1> data_;
+  Eigen::Matrix<Scalar, 5, 1> data_;
 
  public:
   friend class GeometryBase<Cylinder>;

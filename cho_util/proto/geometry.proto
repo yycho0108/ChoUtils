@@ -2,7 +2,7 @@ syntax = "proto3";
 
 // TODO(yycho0108): Consider promoting to a higher level package
 // once geometry is used elsewhere.
-package cho.proto.vis.geometry;
+package cho.proto.core.geometry;
 
 message Vector3f {
   float x = 1;

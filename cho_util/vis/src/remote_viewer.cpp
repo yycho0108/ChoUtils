@@ -5,9 +5,8 @@
 #include "cho_util/vis/queue_io.hpp"
 #include "cho_util/vis/remote_viewer_client.hpp"
 #include "cho_util/vis/remote_viewer_server.hpp"
-#include "cho_util/vis/vtk_viewer.hpp"
-
 #include "cho_util/vis/render_data.hpp"
+#include "cho_util/vis/vtk_viewer.hpp"
 
 namespace cho {
 namespace vis {

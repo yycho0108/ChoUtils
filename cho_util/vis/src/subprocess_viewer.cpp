@@ -1,7 +1,6 @@
-#include "cho_util/core/geometry/geometry_base.hpp"
-
 #include "cho_util/vis/subprocess_viewer.hpp"
 
+#include "cho_util/core/geometry/geometry_base.hpp"
 #include "cho_util/vis/pipe_io.hpp"
 #include "cho_util/vis/render_data.hpp"
 #include "cho_util/vis/subprocess.hpp"

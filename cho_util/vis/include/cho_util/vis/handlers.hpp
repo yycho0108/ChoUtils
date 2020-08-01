@@ -1,5 +1,7 @@
 #pragma once
 
+#include <variant>
+
 #include "cho_util/vis/handler/handler_base.hpp"
 
 #include "cho_util/vis/handler/cloud_handler.hpp"
@@ -10,41 +12,51 @@
 // #include "cho_util/vis/handler/point_handler.hpp"
 #include "cho_util/vis/handler/sphere_handler.hpp"
 
-//#include "cho_util/core/geometry/point_cloud.hpp"
-//
-//#include <vtkActor.h>
-//#include <vtkAlgorithmOutput.h>
-//#include <vtkBoundingBox.h>
-//#include <vtkCallbackCommand.h>
-//#include <vtkCamera.h>
-//#include <vtkCellData.h>
-//#include <vtkCubeSource.h>
-//#include <vtkCylinderSource.h>
-//#include <vtkFloatArray.h>
-//#include <vtkLookupTable.h>
-//#include <vtkNamedColors.h>
-//
-//#include <vtkPlaneSource.h>
-//#include <vtkPolyPointSource.h>
-//#include <vtkSphereSource.h>
-//
-//#include <vtkPolyDataMapper.h>
-//#include <vtkProperty.h>
-//#include <vtkRenderWindow.h>
-//#include <vtkRenderWindowInteractor.h>
-//#include <vtkRenderer.h>
-//#include <vtkSmartPointer.h>
-//#include <vtkUnsignedCharArray.h>
-//#include <vtkVertexGlyphFilter.h>
-//
-//#include <fmt/format.h>
-//#include <fmt/printf.h>
-//
-//#include <string>
-//#include <variant>
-//
-//#include "cho_util/vis/render_data.hpp"
-//
-// namespace cho {
-// namespace vis {}  // namespace vis
-//}  // namespace cho
+namespace cho {
+namespace vis {
+
+using HandlerVariant =
+    std::variant<CloudHandler, CuboidHandler, CylinderHandler, LineHandler,
+                 PlaneHandler, SphereHandler>;
+
+template <typename Geometry>
+struct HandlerMap {};
+template <>
+struct HandlerMap<core::Cuboid<float, 3>> {
+  using type = CuboidHandler;
+};
+template <>
+struct HandlerMap<core::Cylinder<float>> {
+  using type = CylinderHandler;
+};
+template <>
+struct HandlerMap<core::Sphere<float, 3>> {
+  using type = SphereHandler;
+};
+template <>
+struct HandlerMap<core::Point<float, 3>> {
+  // FIXME(yycho0108): invalid
+  using type = CloudHandler;
+};
+template <>
+struct HandlerMap<core::PointCloud<float, 3>> {
+  using type = CloudHandler;
+};
+template <>
+struct HandlerMap<core::Plane<float, 3>> {
+  using type = PlaneHandler;
+};
+template <>
+struct HandlerMap<core::Line<float, 3>> {
+  // FIXME(yycho0108): invalid
+  using type = LineHandler;
+};
+template <>
+struct HandlerMap<core::Lines<float, 3>> {
+  using type = LineHandler;
+};
+template <typename Geometry>
+using HandlerType = typename HandlerMap<Geometry>::type;
+
+}  // namespace vis
+}  // namespace cho

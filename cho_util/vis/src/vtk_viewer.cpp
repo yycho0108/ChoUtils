@@ -1,48 +1,31 @@
 #include "cho_util/vis/vtk_viewer.hpp"
 
-#include <fmt/format.h>
-#include <fmt/printf.h>
-
 #include <chrono>
 #include <thread>
 #include <unordered_map>
 #include <vector>
 
+#include <fmt/format.h>
+#include <fmt/printf.h>
+
 #include <vtkActor.h>
-#include <vtkAlgorithmOutput.h>
-#include <vtkBoundingBox.h>
 #include <vtkCallbackCommand.h>
 #include <vtkCamera.h>
-#include <vtkCellData.h>
-#include <vtkCubeSource.h>
-#include <vtkCylinderSource.h>
-#include <vtkFloatArray.h>
 #include <vtkInteractorStyleTrackballCamera.h>
 #include <vtkLookupTable.h>
 #include <vtkNamedColors.h>
-#include <vtkPlaneSource.h>
-#include <vtkPointSource.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkProperty.h>
-
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderer.h>
-#include <vtkSmartPointer.h>
-#include <vtkUnsignedCharArray.h>
-#include <vtkVertexGlyphFilter.h>
 
 #include "cho_util/core/thread_safe_queue.hpp"
+#include "cho_util/util/mp_utils.hpp"
 #include "cho_util/vis/event_data.hpp"
 #include "cho_util/vis/handlers.hpp"
 #include "cho_util/vis/render_data.hpp"
 
 namespace cho {
 namespace vis {
-
-using HandlerVariant =
-    std::variant<CloudHandler, CylinderHandler, CuboidHandler, SphereHandler,
-                 PlaneHandler, LineHandler>;
 
 class VtkViewer::Impl {
   using ListenerPtr = cho::vis::ListenerPtr<RenderData>;
@@ -55,8 +38,6 @@ class VtkViewer::Impl {
 
   // Cached render resources.
   std::unordered_map<std::string, RenderData> rmap;
-  // std::unordered_map<std::string, vtkSmartPointer<vtkActor>> amap;
-
   std::unordered_map<std::string, HandlerVariant> hmap;
 
   // Application state.
@@ -73,13 +54,10 @@ class VtkViewer::Impl {
        const bool block = true);
 
  public:
-  bool OnData(RenderData&& data);
-
   void Start(const bool block = true);
-
   void Step();
-
   void Spin();
+  bool Render(RenderData&& data);
 };
 
 // Forwarding calls to VtkViewer::Impl.
@@ -89,8 +67,8 @@ VtkViewer::VtkViewer(const ListenerPtr listener, const WriterPtr writer,
 
 VtkViewer::~VtkViewer() = default;
 
-bool VtkViewer::OnData(RenderData&& data) {
-  return impl_->OnData(std::move(data));
+bool VtkViewer::Render(RenderData&& data) {
+  return impl_->Render(std::move(data));
 }
 
 void VtkViewer::Start(const bool block) { return impl_->Start(block); }
@@ -105,85 +83,6 @@ VtkViewer::Impl::Impl(const ListenerPtr listener, const WriterPtr writer,
   if (start) {
     Start(block);
   }
-}
-
-bool VtkViewer::Impl::OnData(RenderData&& data) {
-  vtkSmartPointer<vtkNamedColors> colors =
-      vtkSmartPointer<vtkNamedColors>::New();
-
-  // Early exit and skip processing.
-  if (data.quit) {
-    // TODO(yycho0108): Signal quit status externally as well.
-    std::flush(std::cout);
-    return data.quit;
-  }
-
-  // Copy or move data to rmap to avoid data from going out of scope.
-  // This way, all primitives will have valid data for this duration.
-  const std::string tag = data.tag;
-  auto it = rmap.find(tag);
-  const bool create = (it == rmap.end());
-  if (create) {
-    rmap.emplace(tag, std::forward<RenderData>(data));
-  } else {
-    it->second = std::forward<RenderData>(data);
-  }
-
-  if (create) {
-    // Create
-    const auto& data = rmap[tag];
-
-    std::visit(
-        cho::vis::overloaded{[this, &data](const core::Cuboid<float, 3>&) {
-                               auto h = CuboidHandler{data};
-                               renderer->AddActor(h.GetActor());
-                               hmap.emplace(data.tag, h);
-                             },
-                             [this, &data](const core::Cylinder<float>&) {
-                               auto h = CylinderHandler{data};
-                               renderer->AddActor(h.GetActor());
-                               hmap.emplace(data.tag, h);
-                             },
-                             [this, &data](const core::Line<float, 3>&) {
-                               // auto h = LineHandler{data};
-                               // renderer->AddActor(h.GetActor());
-                               // hmap.emplace(data.tag, h);
-                             },
-                             [this, &data](const core::Sphere<float, 3>&) {
-                               auto h = SphereHandler{data};
-                               renderer->AddActor(h.GetActor());
-                               hmap.emplace(data.tag, h);
-                             },
-
-                             [this, &data](const core::PointCloud<float, 3>&) {
-                               auto h = CloudHandler{data};
-                               renderer->AddActor(h.GetActor());
-                               hmap.emplace(data.tag, h);
-                             },
-
-                             [this, &data](const core::Plane<float, 3>&) {
-                               auto h = PlaneHandler{data};
-                               renderer->AddActor(h.GetActor());
-                               hmap.emplace(data.tag, h);
-                             },
-                             [this, &data](const core::Lines<float, 3>&) {
-                               auto h = LineHandler{data};
-                               renderer->AddActor(h.GetActor());
-                               hmap.emplace(data.tag, h);
-                             },
-                             [](const auto&) {
-
-                             }},
-        data.geometry);
-  } else {
-    // Update
-    const auto& data = rmap[tag];
-    std::visit([&data](auto& h) { h.Update(data); }, hmap.at(data.tag));
-  }
-
-  // Invalidate render cache.
-  should_render = true;
-  return false;
 }
 
 void VtkViewer::Impl::Start(const bool block) {
@@ -219,7 +118,7 @@ void VtkViewer::Impl::Start(const bool block) {
   // Start feeding data.
 
   data_listener_->SetCallback([this](RenderData&& data) -> bool {
-    // return OnData(std::move(data));
+    // return Render(std::move(data));
     render_queue_.emplace(std::move(data));
     return false;
   });
@@ -236,7 +135,7 @@ void VtkViewer::Impl::Start(const bool block) {
   onUpdate->SetCallback(
       [](vtkObject* o, long unsigned int, void* client_data, void*) {
         fmt::print("Timer\n");
-        auto viewer = static_cast<decltype(this)>(client_data);
+        auto* const viewer = static_cast<decltype(this)>(client_data);
         if (viewer->should_render) {
           viewer->render_window->Render();
           viewer->should_render = false;
@@ -260,7 +159,7 @@ void VtkViewer::Impl::Start(const bool block) {
 void VtkViewer::Impl::Step() {
   render_window_interactor->ProcessEvents();
   if (!render_queue_.empty()) {
-    OnData(std::move(render_queue_.front()));
+    Render(std::move(render_queue_.front()));
     render_queue_.pop();
     render_window->Render();
   }
@@ -270,13 +169,50 @@ void VtkViewer::Impl::Spin() {
   // render_window_interactor->Start();
   while (true) {
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    render_window_interactor->ProcessEvents();
-    if (!render_queue_.empty()) {
-      OnData(std::move(render_queue_.front()));
-      render_queue_.pop();
-      render_window->Render();
-    }
+    Step();
   }
 }
+
+bool VtkViewer::Impl::Render(RenderData&& data) {
+  // Early exit and skip processing.
+  if (data.quit) {
+    // TODO(yycho0108): Signal quit status externally as well.
+    std::flush(std::cout);
+    return data.quit;
+  }
+
+  // Copy or move data to rmap to avoid data from going out of scope.
+  // This way, all primitives will have valid data for this duration.
+  const std::string tag = data.tag;
+  auto it = rmap.find(tag);
+  const bool create = (it == rmap.end());
+  if (create) {
+    rmap.emplace(tag, std::move(data));
+  } else {
+    it->second = std::move(data);
+  }
+
+  // Instead of using data directly, use cached data.
+  const auto& cache = rmap[tag];
+  if (create) {
+    // Create
+    std::visit(
+        [this, &cache](const auto& geometry) {
+          using T = std::decay_t<decltype(geometry)>;
+          HandlerType<T> h{cache};
+          renderer->AddActor(h.GetActor());
+          hmap.emplace(cache.tag, h);
+        },
+        data.geometry);
+  } else {
+    // Update
+    std::visit([&cache](auto& h) { h.Update(cache); }, hmap.at(cache.tag));
+  }
+
+  // Invalidate render cache.
+  should_render = true;
+  return false;
+}
+
 }  // namespace vis
 }  // namespace cho

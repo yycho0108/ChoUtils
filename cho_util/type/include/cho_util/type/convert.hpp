@@ -16,8 +16,8 @@ struct Converter {
 template <typename Source, typename Target>
 struct Converter<Source, Target,
                  std::enable_if_t<std::is_same<Source, Target>::value>> {
-  static void ConvertTo(const Source& source, Target* const target) {
-    *target = source;
+  static void ConvertTo(Source&& source, Target* const target) {
+    *target = std::forward<Source>(source);
   }
 };
 
@@ -25,16 +25,18 @@ struct Converter<Source, Target,
 template <typename Source, typename Target>
 struct has_converter {
  private:
+  // TODO(yycho0108): verify if Source&& below is valid.
   template <typename T>
   static constexpr auto check(T*) -> typename std::is_same<
-      decltype(std::declval<T>().ConvertTo(std::declval<const Source&>(),
+      decltype(std::declval<T>().ConvertTo(std::declval<Source&&>(),
                                            std::declval<Target* const>())),
       void>::type;
 
   template <typename>
   static constexpr std::false_type check(...);
 
-  typedef decltype(check<Converter<Source, Target>>(0)) type;
+  typedef decltype(
+      check<Converter<std::decay_t<Source>, std::decay_t<Target>>>(0)) type;
 
  public:
   static constexpr bool value = type::value;
@@ -46,14 +48,10 @@ static constexpr const bool has_converter_v =
 // Functional version.
 template <typename Source, typename Target,
           typename = std::enable_if_t<has_converter_v<Source, Target>>>
-void Convert(const Source& source, Target* const target) {
-  Converter<Source, Target>::ConvertTo(source, target);
+void Convert(Source&& source, Target* const target) {
+  Converter<std::decay_t<Source>, std::decay_t<Target>>::ConvertTo(
+      std::forward<Source>(source), target);
 }
-
-//template <typename Source, typename Target>
-//void Convert(Source&& source, Target* const target) {
-//  Convert(std::forward<Source>(source), target);
-//}
 
 namespace impl {
 class require_deduction_helper {
@@ -69,9 +67,9 @@ template <
     typename Target, require_deduction...,
     typename = std::enable_if_t<std::is_default_constructible<Target>::value>,
     typename Source>
-Target Convert(const Source& source) {
+Target Convert(Source&& source) {
   Target target;
-  Convert(source, &target);
+  Convert(std::forward<Source>(source), &target);
   return target;
 }
 

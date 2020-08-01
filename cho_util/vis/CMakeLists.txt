@@ -20,7 +20,7 @@ find_package(
 # Datatype Conversion for proto <-> geometry types
 add_library(vis_convert_proto SHARED include/cho_util/vis/convert_proto.hpp
                                      src/convert_proto.cpp)
-target_link_libraries(vis_convert_proto PUBLIC ChoUtil::core)
+target_link_libraries(vis_convert_proto PUBLIC ChoUtil::core ChoUtil::util)
 target_link_libraries(vis_convert_proto PUBLIC ChoUtil::type ChoUtil::proto)
 target_include_directories(
   vis_convert_proto
@@ -50,7 +50,7 @@ add_library(
 target_include_directories(
   vtk_viewer PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 target_link_libraries(vtk_viewer PRIVATE ${VTK_LIBRARIES})
-target_link_libraries(vtk_viewer PUBLIC ChoUtil::core fmt)
+target_link_libraries(vtk_viewer PUBLIC ChoUtil::core ChoUtil::util fmt)
 vtk_module_autoinit(TARGETS vtk_viewer MODULES ${VTK_LIBRARIES})
 add_library(${PROJECT_NAME}::vtk_viewer ALIAS vtk_viewer)
 

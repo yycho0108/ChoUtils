@@ -11,6 +11,7 @@
 #include "cho_util/vis/queue_io_fwd.hpp"
 #include "cho_util/vis/render_data_fwd.hpp"
 #include "cho_util/vis/subprocess.hpp"
+#include "cho_util/vis/viewer_base.hpp"
 #include "cho_util/vis/vtk_viewer_fwd.hpp"
 
 namespace cho {
@@ -20,7 +21,7 @@ namespace vis {
  *
  *
  */
-class DirectViewer {
+class DirectViewer : public ViewerBase<DirectViewer> {
  public:
   DirectViewer(const bool start = false);
 
@@ -31,9 +32,11 @@ class DirectViewer {
 
   // App runners
   void Start();
-  void StartServer();
-  void Render(const RenderData& data);
+  void Step();
   void Spin();
+  void Render(const RenderData& data);
+
+  void StartServer();
 
  private:
   std::shared_ptr<thread_safe_queue<RenderData>> data_queue_;

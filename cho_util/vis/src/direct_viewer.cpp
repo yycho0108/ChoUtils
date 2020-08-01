@@ -32,8 +32,8 @@ void DirectViewer::StartServer() {
       std::make_shared<QueueWriter<RenderData>>(event_queue_);
   QueueListenerPtr<RenderData> data_listener =
       std::make_shared<QueueListener<RenderData>>(data_queue_);
-  viewer_ = std::make_shared<VtkViewer>(
-      data_listener, event_writer, true, false);
+  viewer_ =
+      std::make_shared<VtkViewer>(data_listener, event_writer, true, false);
 }
 
 void DirectViewer::Render(const RenderData& data) {
@@ -46,6 +46,7 @@ void DirectViewer::Render(const RenderData& data) {
   viewer_->Step();
 }
 
+void DirectViewer::Step() { viewer_->Step(); }
 void DirectViewer::Spin() { viewer_->Spin(); }
 
 }  // namespace vis

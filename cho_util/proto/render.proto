@@ -35,19 +35,18 @@ enum RepresentationType {
 // request
 message RenderRequest {
   string name = 1;
-  RenderType type = 2;
   RepresentationType representation = 3;
   oneof color {
-    geometry.Color uniform = 4;
-    geometry.Colors each = 5;
+    core.geometry.Color uniform = 4;
+    core.geometry.Colors each = 5;
   }
   oneof data {
-    geometry.Point point = 7;
-    geometry.PointCloud cloud = 8;
-    geometry.Lines lines = 9;
-    geometry.Plane plane = 10;
-    geometry.Sphere sphere = 11;
-    geometry.Cuboid cuboid = 12;
+    core.geometry.Point point = 7;
+    core.geometry.PointCloud cloud = 8;
+    core.geometry.Lines lines = 9;
+    core.geometry.Plane plane = 10;
+    core.geometry.Sphere sphere = 11;
+    core.geometry.Cuboid cuboid = 12;
   }
   float opacity = 6;
 }

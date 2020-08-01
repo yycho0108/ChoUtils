@@ -28,8 +28,8 @@ using RenderClientPtr = std::shared_ptr<RenderClient>;
  */
 class RemoteViewerServer {
  public:
-  inline RemoteViewerServer(const bool start,
-                            const std::string& address = "0.0.0.0:50051")
+  inline explicit RemoteViewerServer(
+      const bool start, const std::string& address = "0.0.0.0:50051")
       : started_(false) {
     if (start) {
       Start(address);

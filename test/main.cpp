@@ -7,9 +7,9 @@
 
 int main()
 {
-    std::cout << CU_VERSION_MAJOR << std::endl;
-    std::cout << CU_VERSION_MINOR << std::endl;
-    std::cout << CU_VERSION_PATCH << std::endl;
+    std::cout << CHO_VERSION_MAJOR << std::endl;
+    std::cout << CHO_VERSION_MINOR << std::endl;
+    std::cout << CHO_VERSION_PATCH << std::endl;
 
     cho::util::MTimer timer{ true };
     cho::core::RNG rng;

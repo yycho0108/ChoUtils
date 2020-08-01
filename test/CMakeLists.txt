@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # Threads - required for ProtoBuf package resolution somehow.
-find_package(Threads REQUIRED)
+# find_package(Threads REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(ChoUtil REQUIRED PATHS "$ENV{HOME}/Repos/Ravel/ChoUtils/install/")
 

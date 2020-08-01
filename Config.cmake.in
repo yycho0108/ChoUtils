@@ -15,6 +15,10 @@ foreach(_p RANGE ${_range})
     list(GET _PREREQ            ${_p} _pkg    )
     list(GET _PREREQ_CONFIG_DIR ${_p} _pkg_dir)
     if(_pkg_dir)
+        # Deal with Protobuf requirement for Threads
+        if ("${_pkg}" STREQUAL "Protobuf")
+            find_package(Threads REQUIRED)
+        endif()
         message(STATUS "===> Reloading targets from ${_pkg} ...")
         find_package(${_pkg} REQUIRED NO_MODULE
             PATHS "${_pkg_dir}"

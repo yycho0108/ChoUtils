@@ -20,8 +20,8 @@ find_package(
 # Datatype Conversion for proto <-> geometry types
 add_library(vis_convert_proto SHARED include/cho_util/vis/convert_proto.hpp
                                      src/convert_proto.cpp)
-target_link_libraries(vis_convert_proto PUBLIC ChoUtil::core ChoUtil::util)
-target_link_libraries(vis_convert_proto PUBLIC ChoUtil::type ChoUtil::proto)
+target_link_libraries(vis_convert_proto PUBLIC ChoUtil::core ChoUtil::util
+                                               ChoUtil::type ChoUtil::proto)
 target_include_directories(
   vis_convert_proto
   PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)

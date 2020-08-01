@@ -2,3 +2,22 @@
 include( "${CMAKE_CURRENT_LIST_DIR}/ChoUtilTargets.cmake" )
 set_and_check(@PROJECT_NAME@_INCLUDE_DIRS "@PACKAGE_INCLUDE_INSTALL_DIR@")
 # set_and_check(@PROJECT_NAME@_LIBRARIES "@PROJECT_NAME@")
+
+# Load prerequisites that were used in config mode.
+# Adapted from the reference in the following link:
+# https://docs.salome-platform.org/latest/dev/cmake/html/config.html
+set(_PREREQ Protobuf gRPC)
+set(_PREREQ_CONFIG_DIR "@Protobuf_DIR@" "@gRPC_DIR@")
+list(LENGTH _PREREQ_CONFIG_DIR _list_len)
+math(EXPR _range "${_list_len}-1")
+foreach(_p RANGE ${_range})
+    # Iterate through prerequisites ...
+    list(GET _PREREQ            ${_p} _pkg    )
+    list(GET _PREREQ_CONFIG_DIR ${_p} _pkg_dir)
+    if(_pkg_dir)
+        message(STATUS "===> Reloading targets from ${_pkg} ...")
+        find_package(${_pkg} REQUIRED NO_MODULE
+            PATHS "${_pkg_dir}"
+            NO_DEFAULT_PATH)
+    endif()
+endforeach()

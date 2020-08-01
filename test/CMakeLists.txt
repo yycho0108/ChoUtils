@@ -4,25 +4,18 @@ project(choutil-test)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
+# Threads - required for ProtoBuf package resolution somehow.
 find_package(Threads REQUIRED)
-
-set(protobuf_MODULE_COMPATIBLE TRUE)
-find_package(Protobuf CONFIG REQUIRED)
-message(STATUS "Using protobuf ${protobuf_VERSION}")
-set(_PROTOBUF_LIBPROTOBUF protobuf::libprotobuf)
-set(_REFLECTION gRPC::grpc++_reflection)
-find_package(gRPC CONFIG REQUIRED)
-message(STATUS "Using gRPC ${gRPC_VERSION}")
-
-# message("$ENV{HOME}/Repos/Ravel/ChoUtils/install/")
 find_package(Eigen3 REQUIRED)
 find_package(ChoUtil REQUIRED PATHS "$ENV{HOME}/Repos/Ravel/ChoUtils/install/")
 
-get_cmake_property(_variableNames VARIABLES)
-list(SORT _variableNames)
-foreach(_variableName ${_variableNames})
-  message(STATUS "${_variableName}=${${_variableName}}")
-endforeach()
+if(FALSE)
+  get_cmake_property(_variableNames VARIABLES)
+  list(SORT _variableNames)
+  foreach(_variableName ${_variableNames})
+    message(STATUS "${_variableName}=${${_variableName}}")
+  endforeach()
+endif()
 
 add_executable(${PROJECT_NAME} main.cpp)
 target_include_directories(${PROJECT_NAME} PUBLIC ${ChoUtil_INCLUDE_DIRS})

@@ -12,12 +12,12 @@ class Point : public GeometryBase<Point<_Scalar, N>> {
   using Scalar = _Scalar;
 
  public:
-  template <typename... Args>
-  Point(Args&&... args) : data_(args...) {}
+  Point() {}
+  Point(std::initializer_list<Scalar> args) : data_(args) {}
 
-  const Scalar* GetPtrImpl() const { return data_.data(); }
-  Scalar* GetPtrImpl() { return data_.data(); }
-  static constexpr int GetSizeImpl() { return N; }
+  const Scalar* GetPtr() const { return data_.data(); }
+  Scalar* GetPtr() { return data_.data(); }
+  static constexpr int GetSize() { return N; }
 
   auto& GetData() { return data_; }
   const auto& GetData() const { return data_; }
@@ -27,7 +27,7 @@ class Point : public GeometryBase<Point<_Scalar, N>> {
 
  public:
   friend class GeometryBase<Point>;
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  // EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 template <typename _Scalar, int N>

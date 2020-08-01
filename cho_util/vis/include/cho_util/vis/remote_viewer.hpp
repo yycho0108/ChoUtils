@@ -7,7 +7,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include "cho_util/vis/handler_fwd.hpp"
 #include "cho_util/vis/render_data_fwd.hpp"
 #include "cho_util/vis/subprocess.hpp"
 #include "cho_util/vis/vtk_viewer_fwd.hpp"

@@ -97,6 +97,7 @@ class FdWriter : public Writer {
     if (flush) {
       std::flush(fout);
     }
+    return true;
   }
 
  private:

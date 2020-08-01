@@ -17,6 +17,12 @@ using GeometryVariant =
                  core::Line<float, 3>, core::Lines<float, 3>,
                  core::Plane<float, 3>, core::Sphere<float, 3>,
                  core::Cylinder<float>, core::Cuboid<float, 3>>;
+template <class... Ts>
+struct overloaded : Ts... {
+  using Ts::operator()...;
+};
+template <class... Ts>
+overloaded(Ts...)->overloaded<Ts...>;
 
 enum RenderType : std::int16_t {
   kNone,
@@ -82,7 +88,7 @@ struct RenderData {
   //#define ADD_CASE(name)                                                       \
   //case RenderType::name: {                                                   \
   //  auto geo = std::dynamic_pointer_cast<GeometryMap<name>::type>(geometry); \
-  //  ar&(*geo);                                                               \
+  //  ar&geo;                                                               \
   //  break;                                                                   \
   //}
   //    switch (render_type) {

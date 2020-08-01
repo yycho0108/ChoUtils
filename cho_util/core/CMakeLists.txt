@@ -4,6 +4,7 @@ find_package(Eigen3 REQUIRED)
 
 add_library(
   cho_util_core
+  SHARED
   src/random.cpp
   src/math.cpp
   include/cho_util/core/version.hpp

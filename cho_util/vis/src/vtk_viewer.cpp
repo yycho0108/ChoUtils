@@ -40,6 +40,10 @@
 namespace cho {
 namespace vis {
 
+using HandlerVariant =
+    std::variant<CloudHandler, CylinderHandler, CuboidHandler, SphereHandler,
+                 PlaneHandler, LineHandler>;
+
 class VtkViewer::Impl {
   using ListenerPtr = cho::vis::ListenerPtr<RenderData>;
   using WriterPtr = cho::vis::WriterPtr;
@@ -48,11 +52,12 @@ class VtkViewer::Impl {
   // I/O
   ListenerPtr data_listener_;
   WriterPtr event_writer_;
-  std::unordered_map<int, HandlerPtr> handlers_;
 
   // Cached render resources.
   std::unordered_map<std::string, RenderData> rmap;
-  std::unordered_map<std::string, vtkSmartPointer<vtkActor>> amap;
+  // std::unordered_map<std::string, vtkSmartPointer<vtkActor>> amap;
+
+  std::unordered_map<std::string, HandlerVariant> hmap;
 
   // Application state.
   vtkSmartPointer<vtkRenderWindow> render_window;
@@ -68,39 +73,6 @@ class VtkViewer::Impl {
        const bool block = true);
 
  public:
-  std::vector<int> GetAvailableHandlers(const int size) const;
-
-  template <typename HandlerRef>
-  int RegisterHandlerImpl(HandlerRef handler,
-                          std::unordered_map<int, HandlerPtr>* const handlers,
-                          const int rtype = -1) {
-    int rtype_{-1};
-    if (rtype >= RenderType::kUser) {
-      // Use supplied id.
-      if (handlers->find(rtype) != handlers->end()) {
-        return -1;
-      }
-      rtype_ = rtype;
-    } else {
-      // Try to assign an unused handler id.
-      while (true) {
-        if (handlers->find(rtype_) == handlers->end()) {
-          break;
-          ++rtype_;
-        }
-      }
-    }
-
-    // Set + return handler id.
-    handlers->emplace(rtype_, std::make_shared<Handler>(handler));
-    return rtype_;
-  }
-  int RegisterHandler(Handler&& handler, const int rtype);
-
-  int RegisterHandler(const Handler& handler, const int rtype);
-
-  void RegisterDefaultHandlers();
-
   bool OnData(RenderData&& data);
 
   void Start(const bool block = true);
@@ -114,22 +86,8 @@ class VtkViewer::Impl {
 VtkViewer::VtkViewer(const ListenerPtr listener, const WriterPtr writer,
                      const bool start, const bool block)
     : impl_{new Impl(listener, writer, start, block)} {}
-std::vector<int> VtkViewer::GetAvailableHandlers(const int size) const {
-  return impl_->GetAvailableHandlers(size);
-}
+
 VtkViewer::~VtkViewer() = default;
-
-int VtkViewer::RegisterHandler(Handler&& handler, const int rtype) {
-  return impl_->RegisterHandler(std::move(handler), rtype);
-}
-
-int VtkViewer::RegisterHandler(const Handler& handler, const int rtype) {
-  return impl_->RegisterHandler(handler, rtype);
-}
-
-void VtkViewer::RegisterDefaultHandlers() {
-  return impl_->RegisterDefaultHandlers();
-}
 
 bool VtkViewer::OnData(RenderData&& data) {
   return impl_->OnData(std::move(data));
@@ -149,51 +107,6 @@ VtkViewer::Impl::Impl(const ListenerPtr listener, const WriterPtr writer,
   }
 }
 
-std::vector<int> VtkViewer::Impl::GetAvailableHandlers(const int size) const {
-  std::vector<int> out;
-  out.reserve(size);
-
-  int index = RenderType::kUser;
-  while (out.size() < size) {
-    if (handlers_.find(index) != handlers_.end()) {
-      ++index;
-      continue;
-    }
-    out.emplace_back(index);
-  }
-  return out;
-}
-int VtkViewer::Impl::RegisterHandler(Handler&& handler, const int rtype) {
-  return RegisterHandlerImpl(handler, &handlers_, rtype);
-}
-
-int VtkViewer::Impl::RegisterHandler(const Handler& handler, const int rtype) {
-  return RegisterHandlerImpl(handler, &handlers_, rtype);
-}
-
-void VtkViewer::Impl::RegisterDefaultHandlers() {
-  vtkSmartPointer<vtkNamedColors> colors =
-      vtkSmartPointer<vtkNamedColors>::New();
-
-  // Example: custom plane
-  // RegisterHandler(
-  //    Handler{[colors](const RenderData& rd) -> vtkSmartPointer<vtkActor> {
-  //              return GetPlaneActor(colors, &rd.data[0], &rd.data[3]);
-  //            },
-  //            [](const vtkSmartPointer<vtkActor>& actor, const RenderData& rd)
-  //            {
-  //              vtkSmartPointer<vtkAlgorithm> alg =
-  //                  actor->GetMapper()->GetInputConnection(0,
-  //                  0)->GetProducer();
-  //              vtkSmartPointer<vtkPlaneSource> plane =
-  //                  vtkPlaneSource::SafeDownCast(alg);
-  //              plane->SetCenter(rd.data[0], rd.data[1], rd.data[2]);
-  //              plane->SetNormal(rd.data[3], rd.data[4], rd.data[5]);
-  //              plane->Update();
-  //            }},
-  //    GetAvailableHandlers(1)[0]);
-}
-
 bool VtkViewer::Impl::OnData(RenderData&& data) {
   vtkSmartPointer<vtkNamedColors> colors =
       vtkSmartPointer<vtkNamedColors>::New();
@@ -205,42 +118,67 @@ bool VtkViewer::Impl::OnData(RenderData&& data) {
     return data.quit;
   }
 
-  // Copy data to rmap to avoid data from going out of scope.
+  // Copy or move data to rmap to avoid data from going out of scope.
   // This way, all primitives will have valid data for this duration.
   const std::string tag = data.tag;
   auto it = rmap.find(tag);
   const bool create = (it == rmap.end());
   if (create) {
-    rmap.emplace(tag, std::move(data));
+    rmap.emplace(tag, std::forward<RenderData>(data));
   } else {
-    it->second = std::move(data);
+    it->second = std::forward<RenderData>(data);
   }
 
   if (create) {
     // Create
     const auto& data = rmap[tag];
-    auto actor = cho::vis::Render(colors, data);
-    if (!actor) {
-      auto it = handlers_.find(data.render_type);
-      if (it != handlers_.end()) {
-        fmt::print("Fallback\n");
-        actor = it->second->create(data);
-      }
-      if (!actor) {
-        return false;
-      }
-    }
-    renderer->AddActor(actor);
-    amap[data.tag] = actor;
+
+    std::visit(
+        cho::vis::overloaded{[this, &data](const core::Cuboid<float, 3>&) {
+                               auto h = CuboidHandler{data};
+                               renderer->AddActor(h.GetActor());
+                               hmap.emplace(data.tag, h);
+                             },
+                             [this, &data](const core::Cylinder<float>&) {
+                               auto h = CylinderHandler{data};
+                               renderer->AddActor(h.GetActor());
+                               hmap.emplace(data.tag, h);
+                             },
+                             [this, &data](const core::Line<float, 3>&) {
+                               // auto h = LineHandler{data};
+                               // renderer->AddActor(h.GetActor());
+                               // hmap.emplace(data.tag, h);
+                             },
+                             [this, &data](const core::Sphere<float, 3>&) {
+                               auto h = SphereHandler{data};
+                               renderer->AddActor(h.GetActor());
+                               hmap.emplace(data.tag, h);
+                             },
+
+                             [this, &data](const core::PointCloud<float, 3>&) {
+                               auto h = CloudHandler{data};
+                               renderer->AddActor(h.GetActor());
+                               hmap.emplace(data.tag, h);
+                             },
+
+                             [this, &data](const core::Plane<float, 3>&) {
+                               auto h = PlaneHandler{data};
+                               renderer->AddActor(h.GetActor());
+                               hmap.emplace(data.tag, h);
+                             },
+                             [this, &data](const core::Lines<float, 3>&) {
+                               auto h = LineHandler{data};
+                               renderer->AddActor(h.GetActor());
+                               hmap.emplace(data.tag, h);
+                             },
+                             [](const auto&) {
+
+                             }},
+        data.geometry);
   } else {
     // Update
     const auto& data = rmap[tag];
-    auto it = handlers_.find(data.render_type);
-    if (it != handlers_.end()) {
-      it->second->update(amap[data.tag], data);
-    } else {
-      cho::vis::Update(amap[data.tag], data);
-    }
+    std::visit([&data](auto& h) { h.Update(data); }, hmap.at(data.tag));
   }
 
   // Invalidate render cache.

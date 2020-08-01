@@ -12,12 +12,14 @@ class Sphere : public GeometryBase<Sphere<_Scalar, N>> {
   using Scalar = _Scalar;
 
  public:
-  template <typename... Args>
-  Sphere(Args&&... args) : data_(args...) {}
+  Sphere() {}
+  Sphere(std::initializer_list<Scalar> args) {
+    std::copy(args.begin(), args.end(), data_.data());
+  }
 
-  const Scalar* GetPtrImpl() const { return data_.data(); }
-  Scalar* GetPtrImpl() { return data_.data(); }
-  static constexpr int GetSizeImpl() { return N + 1; }
+  const Scalar* GetPtr() const { return data_.data(); }
+  Scalar* GetPtr() { return data_.data(); }
+  static constexpr int GetSize() { return N + 1; }
 
   auto& GetData() { return data_; }
   const auto& GetData() const { return data_; }
@@ -40,7 +42,7 @@ class Sphere : public GeometryBase<Sphere<_Scalar, N>> {
 
  public:
   friend class GeometryBase<Sphere>;
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  // EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 template <typename _Scalar, int N>

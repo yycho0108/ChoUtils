@@ -3,6 +3,7 @@
 #include "cho_util/core/geometry/geometry_base.hpp"
 
 #include <Eigen/Core>
+#include <initializer_list>
 
 namespace cho {
 namespace core {
@@ -12,12 +13,12 @@ class Cylinder : public GeometryBase<Cylinder<_Scalar>> {
   using Scalar = _Scalar;
 
  public:
-  template <typename... Args>
-  Cylinder(Args&&... args) : data_(args...) {}
+  Cylinder() {}
+  Cylinder(std::initializer_list<Scalar> args) : data_(args) {}
 
-  const Scalar* GetPtrImpl() const { return data_.data(); }
-  Scalar* GetPtrImpl() { return data_.data(); }
-  static constexpr int GetSizeImpl() { return 7; }
+  const Scalar* GetPtr() const { return data_.data(); }
+  Scalar* GetPtr() { return data_.data(); }
+  static constexpr int GetSize() { return 7; }
 
   auto& GetData() { return data_; }
   const auto& GetData() const { return data_; }
@@ -37,7 +38,7 @@ class Cylinder : public GeometryBase<Cylinder<_Scalar>> {
 
  public:
   friend class GeometryBase<Cylinder>;
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  // EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 template <typename _Scalar>

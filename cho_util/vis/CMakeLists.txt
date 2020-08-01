@@ -31,12 +31,20 @@ add_library(
   vtk_viewer SHARED
   include/cho_util/vis/vtk_viewer_fwd.hpp
   include/cho_util/vis/render_data_fwd.hpp
-  include/cho_util/vis/handler_fwd.hpp
   include/cho_util/vis/vtk_viewer.hpp
   include/cho_util/vis/event_data.hpp
   include/cho_util/vis/handlers.hpp
+  include/cho_util/vis/handler/cloud_handler.hpp
+  include/cho_util/vis/handler/cuboid_handler.hpp
+  include/cho_util/vis/handler/cylinder_handler.hpp
+  include/cho_util/vis/handler/line_handler.hpp
+  include/cho_util/vis/handler/plane_handler.hpp
+  include/cho_util/vis/handler/point_handler.hpp
+  include/cho_util/vis/handler/sphere_handler.hpp
+  include/cho_util/vis/handler/point_pair_line_filter.hpp
   include/cho_util/vis/render_data.hpp
   src/handlers.cpp
+  src/point_pair_line_filter.cpp
   src/vtk_viewer.cpp)
 
 target_include_directories(
@@ -87,7 +95,6 @@ add_library(
   include/cho_util/vis/pipe_io_fwd.hpp
   include/cho_util/vis/queue_io_fwd.hpp
   include/cho_util/vis/render_data_fwd.hpp
-  include/cho_util/vis/handler_fwd.hpp
   include/cho_util/vis/vtk_viewer_fwd.hpp
   include/cho_util/vis/io.hpp
   include/cho_util/vis/pipe_io.hpp

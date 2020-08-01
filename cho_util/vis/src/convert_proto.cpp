@@ -114,12 +114,19 @@ CHO_DEFINE_CONVERT(vis::RenderType, proto::vis::render::RenderType) {
 #undef ADD_CASE
 }
 
-template <class... Ts>
-struct overloaded : Ts... {
-  using Ts::operator()...;
-};
-template <class... Ts>
-overloaded(Ts...)->overloaded<Ts...>;
+// Overloaded lambdas trick
+// template <class... Ts>
+// struct overloaded : Ts... {
+//  overloaded(Ts...) = delete;
+//  using Ts::operator()...;
+//};
+// template <class... Ts>
+// overloaded(Ts...)->overloaded<Ts...>;
+
+// struct ConvertGeometry {
+//  void operator()(const vis::GeometryVariant& geo,
+//                  proto::vis::render::RenderRequest* const req) {}
+//};
 
 void ::cho::type::
     Converter<vis::RenderData, proto::vis::render::RenderRequest>::ConvertTo(
@@ -144,27 +151,25 @@ void ::cho::type::
   // Opacity defaults to 1.0 for now.
   req->set_opacity(1.0f);
   fmt::print("<case>\n");
-
   std::visit(
-      overloaded{
-
-          [&req](const core::PointCloud<float, 3>& geom) {
-            cho::type::Convert(geom, req->mutable_cloud());
-          },
-          [&req](const core::Lines<float, 3>& geom) {
-            cho::type::Convert(geom, req->mutable_lines());
-          },
-          [&req](const core::Plane<float, 3>& geom) {
-            cho::type::Convert(geom, req->mutable_plane());
-          },
-          [&req](const core::Sphere<float, 3>& geom) {
-            cho::type::Convert(geom, req->mutable_sphere());
-          },
-          [&req](const core::Cuboid<float, 3>& geom) {
-            cho::type::Convert(geom, req->mutable_cuboid());
-          }
-
-      },
+      cho::vis::overloaded{[&req](const core::PointCloud<float, 3>& geom) {
+                             cho::type::Convert(geom, req->mutable_cloud());
+                           },
+                           [&req](const core::Lines<float, 3>& geom) {
+                             cho::type::Convert(geom, req->mutable_lines());
+                           },
+                           [&req](const core::Plane<float, 3>& geom) {
+                             cho::type::Convert(geom, req->mutable_plane());
+                           },
+                           [&req](const core::Sphere<float, 3>& geom) {
+                             cho::type::Convert(geom, req->mutable_sphere());
+                           },
+                           [&req](const core::Cuboid<float, 3>& geom) {
+                             cho::type::Convert(geom, req->mutable_cuboid());
+                           },
+                           [](const auto& arg) {
+                             throw std::out_of_range("Unsupported overload");
+                           }},
       rd.geometry);
 
 #define ADD_CASE(NAME, TARGET)                                          \
@@ -225,16 +230,8 @@ void ::cho::type::Converter<
   rd->tag = req.name();
   Convert(req.type(), &rd->render_type);
   Convert(req.representation(), &rd->representation);
+  fmt::print("Got Type = {}\n", req.data_case());
   rd->quit = false;
-
-#define ADD_CASE(NAME, SOURCE)                                      \
-  case vis::RenderType::NAME: {                                     \
-    auto geo = std::make_shared<                                    \
-        cho::vis::GeometryMap<cho::vis::RenderType::NAME>::type>(); \
-    cho::type::Convert(SOURCE, geo.get());                          \
-    rd->geometry = geo;                                             \
-    break;                                                          \
-  }
 
   switch (req.data_case()) {
     case proto::vis::render::RenderRequest::DataCase::kCloud: {
@@ -258,24 +255,11 @@ void ::cho::type::Converter<
       break;
     }
     default: {
+      fmt::print("DC={}\n", req.data_case());
       throw std::out_of_range("Unsupported data case !!!");
       break;
     }
   }
-
-    //// Set Points.
-    // switch (rd->render_type) {
-    //  case vis::RenderType::kNone: {
-    //    break;
-    //  }
-    //    ADD_CASE(kPoints, req.cloud())
-    //    ADD_CASE(kLines, req.lines())
-    //    ADD_CASE(kPlane, req.plane())
-    //    ADD_CASE(kSphere, req.sphere())
-    //    ADD_CASE(kCuboid, req.cuboid())
-    //  default: { break; }
-    //}
-#undef ADD_CASE
 
   // Set Color.
   rd->color.clear();

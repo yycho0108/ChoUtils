@@ -5,6 +5,8 @@
 #include "cho_util/type/convert.hpp"
 #include "cho_util/vis/render_data.hpp"
 
+#include "fmt/printf.h"
+
 namespace cho {
 namespace type {
 
@@ -92,11 +94,11 @@ struct Converter<proto::vis::geometry::PointCloud, core::PointCloud<Scalar, 3>,
   static void ConvertTo(const proto::vis::geometry::PointCloud& source,
                         core::PointCloud<Scalar, 3>* const target) {
     const int n = source.points_size();
-    target->GetData().resize(n, 3);
+    target->SetNumPoints(n);
 
     for (int i = 0; i < n; ++i) {
       const auto& src = source.points(i);
-      auto dst = target->GetData().col(i);
+      auto dst = target->GetPoint(i);
       dst.x() = src.x();
       dst.y() = src.y();
       dst.z() = src.z();
@@ -110,10 +112,10 @@ struct Converter<core::PointCloud<Scalar, 3>, proto::vis::geometry::PointCloud,
   static void ConvertTo(const core::PointCloud<Scalar, 3>& source,
                         proto::vis::geometry::PointCloud* const target) {
     const auto& src = source.GetData();
-    target->mutable_points()->Reserve(src.cols());
-    for (int i = 0; i < src.cols(); ++i) {
+    target->mutable_points()->Reserve(source.GetNumPoints());
+    for (int i = 0; i < source.GetNumPoints(); ++i) {
       auto point = target->mutable_points()->Add();
-      Convert(src.col(i), point);
+      Convert(source.GetPoint(i), point);
     }
   }
 };
@@ -186,15 +188,13 @@ struct Converter<proto::vis::geometry::Lines, core::Lines<Scalar, 3>,
                  std::enable_if_t<std::is_arithmetic<Scalar>::value>> {
   static void ConvertTo(const proto::vis::geometry::Lines& source,
                         core::Lines<Scalar, 3>* const target) {
-    auto& dst = target->GetData();
-    dst.resize(source.lines_size() * 3, 2);
+    target->SetNumLines(source.lines_size());
     for (int i = 0; i < source.lines_size(); ++i) {
       const auto& line = source.lines(i);
-      auto block = dst.template block<3, 2>(i, 0);
-      auto blk0 = block.col(0);
-      auto blk1 = block.col(1);
-      Convert(line.start(), &blk0);
-      Convert(line.end(), &blk1);
+      auto src_pt = target->GetSourcePoint(i);
+      auto dst_pt = target->GetTargetPoint(i);
+      Convert(line.start(), &src_pt);
+      Convert(line.end(), &dst_pt);
     }
   }
 };
@@ -205,14 +205,14 @@ struct Converter<core::Lines<Scalar, 3>, proto::vis::geometry::Lines,
   static void ConvertTo(const core::Lines<Scalar, 3>& source,
                         proto::vis::geometry::Lines* const target) {
     auto& src = source.GetData();
-    const int n = src.rows() / 3;
+    const int n = source.GetNumLines();
     target->mutable_lines()->Reserve(n);
     for (int i = 0; i < n; ++i) {
-      const auto s = src.template block<3, 1>(i * 3, 0);
-      const auto e = src.template block<3, 1>(i * 3, 1);
-      auto line = target->mutable_lines(i);
-      Convert(Eigen::Vector3f{s}, line->mutable_start());
-      Convert(Eigen::Vector3f{e}, line->mutable_end());
+      const auto s = source.GetSourcePoint(i);
+      const auto e = source.GetTargetPoint(i);
+      auto line = target->mutable_lines()->Add();
+      Convert(s, line->mutable_start());
+      Convert(e, line->mutable_end());
     }
   }
 };

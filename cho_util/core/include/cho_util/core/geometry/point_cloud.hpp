@@ -12,17 +12,21 @@ class PointCloud : public GeometryBase<PointCloud<_Scalar, N>> {
   using Scalar = _Scalar;
 
  public:
-  template <typename... Args>
-  PointCloud(Args&&... args) : data_(args...) {}
+  PointCloud() {}
+  PointCloud(std::initializer_list<Scalar> args) : data_(args) {}
 
-  const Scalar* GetPtrImpl() const { return data_.data(); }
-  Scalar* GetPtrImpl() { return data_.data(); }
-  int GetSizeImpl() const { return N * data_.cols(); }
+  const Scalar* GetPtr() const { return data_.data(); }
+  Scalar* GetPtr() { return data_.data(); }
+  int GetSize() const { return N * data_.cols(); }
 
   auto& GetData() { return data_; }
   const auto& GetData() const { return data_; }
 
   int GetNumPoints() const { return data_.cols(); }
+  auto GetPoint(const int i) { return data_.col(i); }
+  const auto GetPoint(const int i) const { return data_.col(i); }
+
+  void SetNumPoints(const int n) { data_.resize(3, n); }
 
  private:
   // layout: row=ndim, col=npoints
@@ -30,7 +34,7 @@ class PointCloud : public GeometryBase<PointCloud<_Scalar, N>> {
 
  public:
   friend class GeometryBase<PointCloud>;
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  // EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 template <typename _Scalar, int N>

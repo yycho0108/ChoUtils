@@ -12,12 +12,12 @@ class Plane : public GeometryBase<Plane<_Scalar, N>> {
   using Scalar = _Scalar;
 
  public:
-  template <typename... Args>
-  Plane(Args&&... args) : data_(args...) {}
+  Plane() {}
+  Plane(std::initializer_list<Scalar> args) : data_(args) {}
 
-  const Scalar* GetPtrImpl() const { return data_.data(); }
-  Scalar* GetPtrImpl() { return data_.data(); }
-  static constexpr int GetSizeImpl() { return N * 2; }
+  const Scalar* GetPtr() const { return data_.data(); }
+  Scalar* GetPtr() { return data_.data(); }
+  static constexpr int GetSize() { return N * 2; }
 
   auto& GetData() { return data_; }
   const auto& GetData() const { return data_; }
@@ -32,7 +32,7 @@ class Plane : public GeometryBase<Plane<_Scalar, N>> {
 
  public:
   friend class GeometryBase<Plane>;
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  // EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 template <typename _Scalar, int N>

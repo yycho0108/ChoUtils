@@ -5,7 +5,6 @@
 #include <memory>
 
 #include "cho_util/vis/event_data.hpp"
-#include "cho_util/vis/handler_fwd.hpp"
 #include "cho_util/vis/io.hpp"
 #include "cho_util/vis/render_data.hpp"
 
@@ -25,13 +24,10 @@ class VtkViewer {
             const bool start, const bool block = true);
   ~VtkViewer();
 
-  inline std::vector<int> GetAvailableHandlers(const int size) const;
-
-  inline int RegisterHandler(Handler&& handler, const int rtype);
-
-  inline int RegisterHandler(const Handler& handler, const int rtype);
-
-  inline void RegisterDefaultHandlers();
+  // inline std::vector<int> GetAvailableHandlers(const int size) const;
+  // inline int RegisterHandler(Handler&& handler, const int rtype);
+  // inline int RegisterHandler(const Handler& handler, const int rtype);
+  // inline void RegisterDefaultHandlers();
 
   bool OnData(RenderData&& data);
 

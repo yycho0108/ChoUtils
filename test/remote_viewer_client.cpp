@@ -15,7 +15,6 @@ int main() {
   cho::vis::RemoteViewerClient viewer;
 
   cho::vis::RenderData cube{
-      .render_type = cho::vis::RenderType::kCuboid,
       .tag = "cube",
       .geometry = cho::core::Cuboid<float, 3>{{0, 0, 0, 0.5, 0.5, 1.0}},
       .color = {255, 255, 255},
@@ -24,7 +23,6 @@ int main() {
   viewer.Render(cube);
 
   cho::vis::RenderData sphere{
-      .render_type = cho::vis::RenderType::kSphere,
       .tag = "sphere",
       .geometry = cho::core::Sphere<float, 3>{{0, 0, 0, 0.4}},
       .color = {255, 0, 0},
@@ -39,7 +37,6 @@ int main() {
 
   for (int i = 0; i < 1; ++i) {
     cho::vis::RenderData cloud{
-        .render_type = cho::vis::RenderType::kPoints,
         .tag = "cloud",
         .geometry = cloud_geom,
         .color = {255, 255, 0},
@@ -57,7 +54,6 @@ int main() {
   fmt::print("{}x{}\n", ls.rows(), ls.cols());
 
   cho::vis::RenderData lines{
-      .render_type = cho::vis::RenderType::kLines,
       .tag = "lines",
       .geometry = lines_geom,
       .color = {255, 255, 0},

@@ -22,6 +22,15 @@ class Cylinder : public GeometryBase<Cylinder<_Scalar>> {
   auto& GetData() { return data_; }
   const auto& GetData() const { return data_; }
 
+  auto GetCenter() { return data_.template head<3>(); }
+  const auto GetCenter() const { return data_.template head<3>(); }
+
+  auto GetHeight() { return data_(3); }
+  const auto GetHeight() const { return data_(3); }
+
+  auto GetRadius() { return data_(4); }
+  const auto GetRadius() const { return data_(4); }
+
  private:
   // [Center, Radius]
   Eigen::Matrix<Scalar, 7, 1> data_;

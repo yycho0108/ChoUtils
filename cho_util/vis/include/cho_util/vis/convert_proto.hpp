@@ -190,7 +190,6 @@ struct Converter<proto::vis::geometry::Lines, core::Lines<Scalar, 3>,
     dst.resize(source.lines_size() * 3, 2);
     for (int i = 0; i < source.lines_size(); ++i) {
       const auto& line = source.lines(i);
-
       auto block = dst.template block<3, 2>(i, 0);
       auto blk0 = block.col(0);
       auto blk1 = block.col(1);

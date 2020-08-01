@@ -21,6 +21,10 @@ message Colors {
   repeated Color colors = 1;
 }
 
+message Point {
+  Vector3f point = 1;
+}
+
 message PointCloud {
   repeated Vector3f points = 1;
 }

@@ -42,11 +42,12 @@ message RenderRequest {
     geometry.Colors each = 5;
   }
   oneof data {
-    geometry.PointCloud cloud = 7;
-    geometry.Lines lines = 8;
-    geometry.Plane plane = 9;
-    geometry.Sphere sphere = 10;
-    geometry.Cuboid cuboid = 11;
+    geometry.Point point = 7;
+    geometry.PointCloud cloud = 8;
+    geometry.Lines lines = 9;
+    geometry.Plane plane = 10;
+    geometry.Sphere sphere = 11;
+    geometry.Cuboid cuboid = 12;
   }
   float opacity = 6;
 }

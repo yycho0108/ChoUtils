@@ -6,7 +6,6 @@
 #include <Eigen/Core>
 
 #include "cho_util/core/geometry.hpp"
-#include "cho_util/core/geometry/geometry_base.hpp"
 #include "cho_util/proto/geometry.pb.h"
 #include "cho_util/proto/render.grpc.pb.h"
 #include "cho_util/proto/render.pb.h"
@@ -115,6 +114,13 @@ CHO_DEFINE_CONVERT(vis::RenderType, proto::vis::render::RenderType) {
 #undef ADD_CASE
 }
 
+template <class... Ts>
+struct overloaded : Ts... {
+  using Ts::operator()...;
+};
+template <class... Ts>
+overloaded(Ts...)->overloaded<Ts...>;
+
 void ::cho::type::
     Converter<vis::RenderData, proto::vis::render::RenderRequest>::ConvertTo(
         const vis::RenderData& rd,
@@ -126,10 +132,10 @@ void ::cho::type::
   req->set_name(rd.tag);
   // fmt::print("</set-name>\n");
 
-  //proto::vis::render::RenderType rtype;
-  //Convert(rd.render_type, &rtype);
-  //fmt::print("<set-type>\n");
-  //fmt::print("type = {}\n", rd.render_type);
+  // proto::vis::render::RenderType rtype;
+  // Convert(rd.render_type, &rtype);
+  // fmt::print("<set-type>\n");
+  // fmt::print("type = {}\n", rd.render_type);
   req->set_type(Convert<RenderTypeProto>(rd.render_type));
   // fmt::print("</set-type>\n");
   req->set_representation(
@@ -138,6 +144,28 @@ void ::cho::type::
   // Opacity defaults to 1.0 for now.
   req->set_opacity(1.0f);
   fmt::print("<case>\n");
+
+  std::visit(
+      overloaded{
+
+          [&req](const core::PointCloud<float, 3>& geom) {
+            cho::type::Convert(geom, req->mutable_cloud());
+          },
+          [&req](const core::Lines<float, 3>& geom) {
+            cho::type::Convert(geom, req->mutable_lines());
+          },
+          [&req](const core::Plane<float, 3>& geom) {
+            cho::type::Convert(geom, req->mutable_plane());
+          },
+          [&req](const core::Sphere<float, 3>& geom) {
+            cho::type::Convert(geom, req->mutable_sphere());
+          },
+          [&req](const core::Cuboid<float, 3>& geom) {
+            cho::type::Convert(geom, req->mutable_cuboid());
+          }
+
+      },
+      rd.geometry);
 
 #define ADD_CASE(NAME, TARGET)                                          \
   case vis::RenderType::NAME: {                                         \
@@ -148,24 +176,24 @@ void ::cho::type::
     break;                                                              \
   }
 
-  switch (rd.render_type) {
-    case vis::RenderType::kNone: {
-      break;
-    }
-      ADD_CASE(kPoints, req->mutable_cloud())
-      ADD_CASE(kLines, req->mutable_lines())
-      ADD_CASE(kPlane, req->mutable_plane())
-      ADD_CASE(kSphere, req->mutable_sphere())
-      ADD_CASE(kCuboid, req->mutable_cuboid())
-    case vis::RenderType::kUser: {
-      throw std::out_of_range("Unsupported REnder Rtype");
-      break;
-    }
-    default: {
-      throw std::out_of_range("Unsupported REnder Rtype");
-      break;
-    }
-  }
+  // switch (rd.render_type) {
+  //   case vis::RenderType::kNone: {
+  //     break;
+  //   }
+  //     ADD_CASE(kPoints, req->mutable_cloud())
+  //     ADD_CASE(kLines, req->mutable_lines())
+  //     ADD_CASE(kPlane, req->mutable_plane())
+  //     ADD_CASE(kSphere, req->mutable_sphere())
+  //     ADD_CASE(kCuboid, req->mutable_cuboid())
+  //   case vis::RenderType::kUser: {
+  //     throw std::out_of_range("Unsupported REnder Rtype");
+  //     break;
+  //   }
+  //   default: {
+  //     throw std::out_of_range("Unsupported REnder Rtype");
+  //     break;
+  //   }
+  // }
 #undef ADD_CASE
   fmt::print("</case>\n");
 
@@ -208,18 +236,45 @@ void ::cho::type::Converter<
     break;                                                          \
   }
 
-  // Set Points.
-  switch (rd->render_type) {
-    case vis::RenderType::kNone: {
+  switch (req.data_case()) {
+    case proto::vis::render::RenderRequest::DataCase::kCloud: {
+      rd->geometry = Convert<core::PointCloud<float, 3>>(req.cloud());
       break;
     }
-      ADD_CASE(kPoints, req.cloud())
-      ADD_CASE(kLines, req.lines())
-      ADD_CASE(kPlane, req.plane())
-      ADD_CASE(kSphere, req.sphere())
-      ADD_CASE(kCuboid, req.cuboid())
-    default: { break; }
+    case proto::vis::render::RenderRequest::DataCase::kCuboid: {
+      rd->geometry = Convert<core::Cuboid<float, 3>>(req.cuboid());
+      break;
+    }
+    case proto::vis::render::RenderRequest::DataCase::kLines: {
+      rd->geometry = Convert<core::Lines<float, 3>>(req.lines());
+      break;
+    }
+    case proto::vis::render::RenderRequest::DataCase::kPlane: {
+      rd->geometry = Convert<core::Plane<float, 3>>(req.plane());
+      break;
+    }
+    case proto::vis::render::RenderRequest::DataCase::kSphere: {
+      rd->geometry = Convert<core::Sphere<float, 3>>(req.sphere());
+      break;
+    }
+    default: {
+      throw std::out_of_range("Unsupported data case !!!");
+      break;
+    }
   }
+
+    //// Set Points.
+    // switch (rd->render_type) {
+    //  case vis::RenderType::kNone: {
+    //    break;
+    //  }
+    //    ADD_CASE(kPoints, req.cloud())
+    //    ADD_CASE(kLines, req.lines())
+    //    ADD_CASE(kPlane, req.plane())
+    //    ADD_CASE(kSphere, req.sphere())
+    //    ADD_CASE(kCuboid, req.cuboid())
+    //  default: { break; }
+    //}
 #undef ADD_CASE
 
   // Set Color.

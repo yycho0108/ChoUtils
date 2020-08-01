@@ -17,7 +17,7 @@ class Point : public GeometryBase<Point<_Scalar, N>> {
 
   const Scalar* GetPtrImpl() const { return data_.data(); }
   Scalar* GetPtrImpl() { return data_.data(); }
-  static constexpr int GetSize() { return N; }
+  static constexpr int GetSizeImpl() { return N; }
 
   auto& GetData() { return data_; }
   const auto& GetData() const { return data_; }
@@ -30,5 +30,9 @@ class Point : public GeometryBase<Point<_Scalar, N>> {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
+template <typename _Scalar, int N>
+struct GeometryTraits<Point<_Scalar, N>> {
+  using Scalar = _Scalar;
+};
 }  // namespace core
 }  // namespace cho

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <variant>
 
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/vector.hpp>
@@ -10,6 +11,12 @@
 
 namespace cho {
 namespace vis {
+
+using GeometryVariant =
+    std::variant<core::Point<float, 3>, core::PointCloud<float, 3>,
+                 core::Line<float, 3>, core::Lines<float, 3>,
+                 core::Plane<float, 3>, core::Sphere<float, 3>,
+                 core::Cylinder<float>, core::Cuboid<float, 3>>;
 
 enum RenderType : std::int16_t {
   kNone,
@@ -69,38 +76,41 @@ struct RenderData {
         representation);
     ar& render_type;
     ar& tag;
+    std::visit([&ar](auto& geom) { ar& geom; }, geometry);
+  }
 
-#define ADD_CASE(name)                                                       \
-  case RenderType::name: {                                                   \
-    auto geo = std::dynamic_pointer_cast<GeometryMap<name>::type>(geometry); \
-    ar&(*geo);                                                               \
-    break;                                                                   \
-  }
-    switch (render_type) {
-      ADD_CASE(kPoints);
-      ADD_CASE(kLines);
-      ADD_CASE(kPlane);
-      ADD_CASE(kSphere);
-      ADD_CASE(kCylinder);
-      ADD_CASE(kCuboid);
-      default: {
-        throw std::out_of_range("Unsupported render type");
-        break;
-      }
-    }
-    ar& color;
-    ar& rep;
-    ar& quit;
-  }
-#undef ADD_CASE
+  //#define ADD_CASE(name)                                                       \
+  //case RenderType::name: {                                                   \
+  //  auto geo = std::dynamic_pointer_cast<GeometryMap<name>::type>(geometry); \
+  //  ar&(*geo);                                                               \
+  //  break;                                                                   \
+  //}
+  //    switch (render_type) {
+  //      ADD_CASE(kPoints);
+  //      ADD_CASE(kLines);
+  //      ADD_CASE(kPlane);
+  //      ADD_CASE(kSphere);
+  //      ADD_CASE(kCylinder);
+  //      ADD_CASE(kCuboid);
+  //      default: {
+  //        throw std::out_of_range("Unsupported render type");
+  //        break;
+  //      }
+  //    }
+  //#undef ADD_CASE
+  //    ar& color;
+  //    ar& rep;
+  //    ar& quit;
+  //  }
 
   RenderType render_type;
   std::string tag;
-  std::shared_ptr<cho::core::AbstractGeometry<float>> geometry;
+  // std::shared_ptr<cho::core::AbstractGeometry<float>> geometry;
+  GeometryVariant geometry;
   std::vector<std::uint8_t> color;
   Representation representation;
   bool quit;
-};  // namespace vis
+};
 
 }  // namespace vis
 }  // namespace cho

@@ -72,8 +72,23 @@ class CylinderHandler : public BaseHandler<CylinderHandler> {
   }
 
   void UpdateImpl(const RenderData& data) {
-    const auto& src =
-        std::dynamic_pointer_cast<core::Cylinder<float>>(data.geometry);
+    // using GeometryType = std::decay_t<decltype(data.geometry)>;
+    // if(!std::is_same<GeometryType, core::Cylinder<float>>()){
+    //    throw ...
+    //}
+    // if(constexpr std::is_same<GeometryType, core::Cylinder<float>>){
+
+    //}
+
+    std::visit(
+        [this](const auto& geom) {
+          using T = std::decay_t<decltype(geom)>;
+          if constexpr (std::is_same_v<T, core::Cylinder<float>>) {
+            const auto& center = geom.GetCenter();
+            source_->SetCenter(center.x(), center.y(), center.z());
+          }
+        },
+        data.geometry);
     // source_->SetCenter(src.);
     // source_->SetHeight(data.data[3]);
     // source_->SetRadius(data.data[4]);

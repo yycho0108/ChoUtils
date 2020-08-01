@@ -34,3 +34,10 @@ target_include_directories(remote_viewer_client_test
 target_link_libraries(
   remote_viewer_client_test PRIVATE ChoUtil::core ChoUtil::util ChoUtil::vis
                                     ChoUtil::proto Eigen3::Eigen)
+
+add_executable(direct_viewer_client_test direct_viewer_test.cpp)
+target_include_directories(direct_viewer_client_test
+                           PUBLIC ${ChoUtil_INCLUDE_DIRS})
+target_link_libraries(
+  direct_viewer_client_test PRIVATE ChoUtil::core ChoUtil::util ChoUtil::vis
+                                    ChoUtil::proto Eigen3::Eigen)

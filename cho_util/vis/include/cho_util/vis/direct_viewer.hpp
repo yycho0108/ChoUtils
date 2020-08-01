@@ -29,12 +29,6 @@ class DirectViewer {
   inline bool IsServer() const { return true; }
   inline bool IsClient() const { return true; }
 
-  // Data handlers
-  // std::vector<int> GetAvailableHandlers(const int size) const;
-  // int RegisterHandler(Handler&& handler, const int rtype = -1);
-  // int RegisterHandler(const Handler& handler, const int rtype = -1);
-  // void RegisterDefaultHandlers();
-
   // App runners
   void Start();
   void StartServer();

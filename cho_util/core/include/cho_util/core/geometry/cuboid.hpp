@@ -13,7 +13,7 @@ class Cuboid : public GeometryBase<Cuboid<_Scalar, N>> {
   using Scalar = _Scalar;
 
  public:
-  Cuboid() {}
+  explicit constexpr Cuboid() {}
   Cuboid(std::initializer_list<Scalar> args) {
     std::copy(args.begin(), args.end(), data_.data());
   }

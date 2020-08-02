@@ -12,7 +12,7 @@ class PointCloud : public GeometryBase<PointCloud<_Scalar, N>> {
   using Scalar = _Scalar;
 
  public:
-  PointCloud() {}
+  explicit constexpr PointCloud() {}
   PointCloud(std::initializer_list<Scalar> args) : data_(args) {}
 
   const Scalar* GetPtr() const { return data_.data(); }

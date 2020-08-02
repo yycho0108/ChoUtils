@@ -13,7 +13,7 @@ class Cylinder : public GeometryBase<Cylinder<_Scalar>> {
   using Scalar = _Scalar;
 
  public:
-  Cylinder() {}
+  explicit constexpr Cylinder() {}
   Cylinder(std::initializer_list<Scalar> args) : data_(args) {}
 
   const Scalar* GetPtr() const { return data_.data(); }

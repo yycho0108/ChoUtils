@@ -12,7 +12,7 @@ class Plane : public GeometryBase<Plane<_Scalar, N>> {
   using Scalar = _Scalar;
 
  public:
-  Plane() {}
+  explicit constexpr Plane() {}
   Plane(std::initializer_list<Scalar> args) : data_(args) {}
 
   const Scalar* GetPtr() const { return data_.data(); }

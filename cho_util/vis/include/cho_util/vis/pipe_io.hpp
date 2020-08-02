@@ -5,10 +5,10 @@
 #include <chrono>
 #include <future>
 #include <iostream>
+#include <thread>
 
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
-
 #include <boost/iostreams/device/file_descriptor.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <boost/iostreams/stream_buffer.hpp>
@@ -33,7 +33,7 @@ class FdListener : public Listener<DataType> {
   void SetCallback(const Callback& on_data) { this->on_data = on_data; }
 
   void Start() {
-    worker = std::async(std::launch::async, [this] {
+    worker = std::async(std::launch::async, [this]() -> void {
       // Convert file descriptor to stream archive format.
       boost::iostreams::file_descriptor_source fds{
           fd, boost::iostreams::file_descriptor_flags::never_close_handle};
@@ -46,6 +46,7 @@ class FdListener : public Listener<DataType> {
         ar >> data;
         quit |= OnData(std::move(data));
       }
+      return;
     });
   }
 

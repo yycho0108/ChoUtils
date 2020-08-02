@@ -12,6 +12,7 @@ class Line : public GeometryBase<Line<_Scalar, N>> {
   using Scalar = _Scalar;
 
  public:
+  explicit constexpr Line(){}
   template <typename... Args>
   Line(Args&&... args) : data_(args...) {}
 
@@ -40,7 +41,7 @@ class Lines : public GeometryBase<Lines<_Scalar, N>> {
   using Scalar = _Scalar;
 
  public:
-  Lines() {}
+  explicit constexpr Lines() {}
   Lines(std::initializer_list<Scalar> args) : data_(args) {}
 
   const Scalar* GetPtr() const { return data_.data(); }

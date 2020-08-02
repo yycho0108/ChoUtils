@@ -30,7 +30,7 @@ class GeometryBase {
   using Ptr = std::shared_ptr<GeometryBase<Derived>>;
 
  private:
-  GeometryBase() = default;
+  explicit constexpr GeometryBase() = default;
   GeometryBase(const GeometryBase&) = default;
   friend Derived;
 

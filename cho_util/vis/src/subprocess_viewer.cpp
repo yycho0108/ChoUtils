@@ -1,6 +1,6 @@
 #include "cho_util/vis/subprocess_viewer.hpp"
 
-#include "cho_util/core/geometry/geometry_base.hpp"
+#include "cho_util/core/geometry.hpp"
 #include "cho_util/vis/pipe_io.hpp"
 #include "cho_util/vis/render_data.hpp"
 #include "cho_util/vis/subprocess.hpp"
@@ -31,8 +31,12 @@ void SubprocessViewer::StartServer() {
 }
 
 void SubprocessViewer::Render(const RenderData& data) {
+  if (!IsClient()) {
+    throw std::logic_error("Cannot directly invoke render on server.");
+  }
   // NOTE: Client-side.
   if (!data_writer_) {
+    fmt::print("NO WRITER\n");
     return;
   }
   data_writer_->Send<RenderData>(data);

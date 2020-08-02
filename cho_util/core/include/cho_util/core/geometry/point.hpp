@@ -12,7 +12,7 @@ class Point : public GeometryBase<Point<_Scalar, N>> {
   using Scalar = _Scalar;
 
  public:
-  Point() {}
+  explicit constexpr Point() {}
   Point(std::initializer_list<Scalar> args) : data_(args) {}
 
   const Scalar* GetPtr() const { return data_.data(); }

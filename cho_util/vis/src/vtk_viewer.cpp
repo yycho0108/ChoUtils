@@ -28,28 +28,9 @@ namespace cho {
 namespace vis {
 
 class VtkViewer::Impl {
+ public:
   using ListenerPtr = cho::vis::ListenerPtr<RenderData>;
   using WriterPtr = cho::vis::WriterPtr;
-
- private:
-  // I/O
-  ListenerPtr data_listener_;
-  WriterPtr event_writer_;
-
-  // Cached render resources.
-  std::unordered_map<std::string, RenderData> rmap;
-  std::unordered_map<std::string, HandlerVariant> hmap;
-
-  // Application state.
-  vtkSmartPointer<vtkRenderWindow> render_window;
-  vtkSmartPointer<vtkRenderer> renderer;
-  vtkSmartPointer<vtkRenderWindowInteractor> render_window_interactor;
-  bool should_render{true};
-
-  // Hmmm....
-  thread_safe_queue<RenderData> render_queue_;
-
- public:
   Impl(const ListenerPtr listener, const WriterPtr writer, const bool start,
        const bool block = true);
 
@@ -58,6 +39,24 @@ class VtkViewer::Impl {
   void Step();
   void Spin();
   bool Render(RenderData&& data);
+
+ private:
+  // I/O
+  ListenerPtr data_listener_;
+  WriterPtr event_writer_;
+
+  // Cached render resources.
+  std::unordered_map<std::string, RenderData> rmap_;
+  std::unordered_map<std::string, HandlerVariant> hmap_;
+
+  // Application state.
+  vtkSmartPointer<vtkRenderWindow> render_window_;
+  vtkSmartPointer<vtkRenderer> renderer_;
+  vtkSmartPointer<vtkRenderWindowInteractor> render_window_interactor_;
+  bool should_render_{true};
+
+  // Hmmm....
+  thread_safe_queue<RenderData> render_queue_;
 };
 
 // Forwarding calls to VtkViewer::Impl.
@@ -81,6 +80,7 @@ VtkViewer::Impl::Impl(const ListenerPtr listener, const WriterPtr writer,
                       const bool start, const bool block)
     : data_listener_(listener), event_writer_(writer) {
   if (start) {
+    fmt::print("Starting viewer, block = {}\n", block);
     Start(block);
   }
 }
@@ -92,26 +92,26 @@ void VtkViewer::Impl::Start(const bool block) {
   std::array<unsigned char, 4> bkg{{26, 51, 102, 255}};
   colors->SetColor("BkgColor", bkg.data());
 
-  renderer = vtkSmartPointer<vtkRenderer>::New();
-  renderer->SetBackground(colors->GetColor3d("BkgColor").GetData());
+  renderer_ = vtkSmartPointer<vtkRenderer>::New();
+  renderer_->SetBackground(colors->GetColor3d("BkgColor").GetData());
   // Zoom in a little by accessing the camera and invoking its "Zoom" method.
-  renderer->ResetCamera();
-  renderer->GetActiveCamera()->Zoom(1.5);
-  // renderer->GetActiveCamera()->SetPosition(5, 5, 5);
+  renderer_->ResetCamera();
+  renderer_->GetActiveCamera()->Zoom(1.5);
+  // renderer_->GetActiveCamera()->SetPosition(5, 5, 5);
 
   // The render window is the actual GUI window
   // that appears on the computer screen
-  render_window = vtkSmartPointer<vtkRenderWindow>::New();
-  render_window->SetSize(768, 768);
-  render_window->AddRenderer(renderer);
-  render_window->SetWindowName("VtkViewer");
+  render_window_ = vtkSmartPointer<vtkRenderWindow>::New();
+  render_window_->SetSize(768, 768);
+  render_window_->AddRenderer(renderer_);
+  render_window_->SetWindowName("VtkViewer");
 
   // Interaction
-  render_window_interactor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
-  render_window_interactor->SetRenderWindow(render_window);
+  render_window_interactor_ = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+  render_window_interactor_->SetRenderWindow(render_window_);
   vtkSmartPointer<vtkInteractorStyleTrackballCamera> style =
       vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
-  render_window_interactor->SetInteractorStyle(style);
+  render_window_interactor_->SetInteractorStyle(style);
 
   // ListenerPtr on adding new primitives.
   // Register callback for updating or creating actors based on pipe input.
@@ -119,13 +119,11 @@ void VtkViewer::Impl::Start(const bool block) {
 
   data_listener_->SetCallback([this](RenderData&& data) -> bool {
     // return Render(std::move(data));
-    render_queue_.emplace(std::move(data));
+    RenderData cpy = data;
+    // render_queue_.emplace(std::move(data));
+    render_queue_.emplace(std::move(cpy));
     return false;
   });
-
-  if (!data_listener_->IsRunning()) {
-    data_listener_->Start();
-  }
 
   // Periodically refresh the window to reflect updated data.
   // Only render if necessary!
@@ -136,19 +134,24 @@ void VtkViewer::Impl::Start(const bool block) {
       [](vtkObject* o, long unsigned int, void* client_data, void*) {
         fmt::print("Timer\n");
         auto* const viewer = static_cast<decltype(this)>(client_data);
-        if (viewer->should_render) {
-          viewer->render_window->Render();
-          viewer->should_render = false;
+        if (viewer->should_render_) {
+          viewer->render_window_->Render();
+          viewer->should_render_ = false;
         }
       });
 
   // Start event loop.
   // TODO(yycho0108): Forward events produced from the viewer to
   // event_writer_.
-  render_window->Render();
-  render_window_interactor->Initialize();
-  render_window_interactor->AddObserver(vtkCommand::TimerEvent, onUpdate);
-  render_window_interactor->CreateRepeatingTimer(100);
+  render_window_->Render();
+  render_window_interactor_->Initialize();
+  render_window_interactor_->AddObserver(vtkCommand::TimerEvent, onUpdate);
+  render_window_interactor_->CreateRepeatingTimer(100);
+
+  if (!data_listener_->IsRunning()) {
+    data_listener_->Start();
+  }
+  fmt::print("End of initialization\n");
   if (block) {
     Spin();
     // Always exit. Hopefully will be somewhat graceful
@@ -157,16 +160,16 @@ void VtkViewer::Impl::Start(const bool block) {
 }
 
 void VtkViewer::Impl::Step() {
-  render_window_interactor->ProcessEvents();
+  render_window_interactor_->ProcessEvents();
   if (!render_queue_.empty()) {
     Render(std::move(render_queue_.front()));
     render_queue_.pop();
-    render_window->Render();
+    render_window_->Render();
   }
 }
 
 void VtkViewer::Impl::Spin() {
-  // render_window_interactor->Start();
+  // render_window_interactor_->Start();
   while (true) {
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
     Step();
@@ -181,36 +184,36 @@ bool VtkViewer::Impl::Render(RenderData&& data) {
     return data.quit;
   }
 
-  // Copy or move data to rmap to avoid data from going out of scope.
+  // Copy or move data to rmap_ to avoid data from going out of scope.
   // This way, all primitives will have valid data for this duration.
   const std::string tag = data.tag;
-  auto it = rmap.find(tag);
-  const bool create = (it == rmap.end());
+  auto it = rmap_.find(tag);
+  const bool create = (it == rmap_.end());
   if (create) {
-    rmap.emplace(tag, std::move(data));
+    rmap_.emplace(tag, std::move(data));
   } else {
     it->second = std::move(data);
   }
 
   // Instead of using data directly, use cached data.
-  const auto& cache = rmap[tag];
+  const auto& cache = rmap_[tag];
   if (create) {
     // Create
     std::visit(
         [this, &cache](const auto& geometry) {
           using T = std::decay_t<decltype(geometry)>;
           HandlerType<T> h{cache};
-          renderer->AddActor(h.GetActor());
-          hmap.emplace(cache.tag, h);
+          renderer_->AddActor(h.GetActor());
+          hmap_.emplace(cache.tag, h);
         },
         data.geometry);
   } else {
     // Update
-    std::visit([&cache](auto& h) { h.Update(cache); }, hmap.at(cache.tag));
+    std::visit([&cache](auto& h) { h.Update(cache); }, hmap_.at(cache.tag));
   }
 
   // Invalidate render cache.
-  should_render = true;
+  should_render_ = true;
   return false;
 }
 

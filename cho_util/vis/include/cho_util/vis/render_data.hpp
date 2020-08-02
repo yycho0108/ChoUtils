@@ -1,12 +1,15 @@
 #pragma once
 
 #include <memory>
+#include <utility>
 #include <variant>
 
 #include <boost/serialization/array.hpp>
+#include <boost/serialization/nvp.hpp>
 #include <boost/serialization/vector.hpp>
 
 #include "cho_util/core/geometry.hpp"
+#include "cho_util/core/serialize_std_variant.hpp"
 #include "cho_util/vis/render_data_fwd.hpp"
 
 namespace cho {
@@ -26,7 +29,10 @@ struct RenderData {
     auto& rep = reinterpret_cast<std::underlying_type<Representation>::type&>(
         representation);
     ar& tag;
-    std::visit([&ar](auto& geom) { ar& geom; }, geometry);
+    ar& geometry;
+    ar& color;
+    ar& rep;
+    ar& quit;
   }
 
   std::string tag;

@@ -9,6 +9,7 @@ add_library(
   src/math.cpp
   include/cho_util/core/version.hpp
   include/cho_util/core/serialize_eigen.hpp
+  include/cho_util/core/serialize_std_variant.hpp
   include/cho_util/core/math.hpp
   include/cho_util/core/random.hpp
   include/cho_util/core/thread_safe_queue.hpp

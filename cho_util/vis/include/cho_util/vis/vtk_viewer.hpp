@@ -1,13 +1,12 @@
 #pragma once
 
-#include "cho_util/vis/vtk_viewer_fwd.hpp"
-
 #include <memory>
 
 #include "cho_util/vis/event_data.hpp"
 #include "cho_util/vis/io.hpp"
 #include "cho_util/vis/render_data.hpp"
 #include "cho_util/vis/viewer_base.hpp"
+#include "cho_util/vis/vtk_viewer_fwd.hpp"
 
 namespace cho {
 namespace vis {

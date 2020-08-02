@@ -12,7 +12,7 @@ class Sphere : public GeometryBase<Sphere<_Scalar, N>> {
   using Scalar = _Scalar;
 
  public:
-  Sphere() {}
+  explicit constexpr Sphere() {}
   Sphere(std::initializer_list<Scalar> args) {
     std::copy(args.begin(), args.end(), data_.data());
   }

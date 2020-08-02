@@ -14,6 +14,7 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 # Includes ...
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 include(cmake/ChoUtilVersion.cmake)
+include(cmake/ChoUtilPackage.cmake)
 include(cmake/GrpcProto.cmake)
 
 include(GenerateExportHeader)
@@ -56,3 +57,5 @@ write_basic_package_version_file(
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/ChoUtilConfig.cmake"
               "${CMAKE_CURRENT_BINARY_DIR}/ChoUtilConfigVersion.cmake"
         DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/ChoUtil")
+
+include(CPack)

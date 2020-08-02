@@ -39,7 +39,7 @@ int main() {
     cho::vis::RenderData cloud{
         .tag = "cloud",
         .geometry = cloud_geom,
-        .color = {255, 255, 0},
+        .color = {0, 255, 0},
         .representation = cho::vis::RenderData::Representation::kPoints,
         .quit = false};
     viewer.Render(cloud);

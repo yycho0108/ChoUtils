@@ -50,8 +50,38 @@ class CloudHandler : public HandlerBase<CloudHandler> {
       const auto& p = geom.GetPoint(i);
       source_->SetPoint(i, p[0], p[1], p[2]);
     }
-    source_->GetPoints()->Modified();
+    source_->Modified();
+    // source_->GetPoints()->Modified();
+    // source_->Update();
 
+    if (data.color.empty()) {
+    } else if (data.color.size() == 3) {
+      actor_->GetProperty()->SetColor(data.color[0], data.color[1],
+                                      data.color[2]);
+      // fmt::print("UNIFORM\n");
+      // vtkNew<vtkUnsignedCharArray> colors;
+      // colors->SetNumberOfComponents(3);
+      // colors->SetNumberOfTuples(size);
+      // double color[3];
+      // std::copy(&data.color[0], &data.color[3], color);
+      // for (int i = 0; i < size; ++i) {
+      //  colors->SetTuple(i, color);
+      //}
+      // source_->GetOutput()->GetCellData()->SetScalars(colors);
+    } else if (data.color.size() == 3 * size) {
+      fmt::print("EACH\n");
+      vtkNew<vtkUnsignedCharArray> colors;
+      colors->SetNumberOfComponents(3);
+      colors->SetNumberOfTuples(size);
+      double color[3];
+      for (int i = 0; i < size; ++i) {
+        std::copy(&data.color[i * 3], &data.color[(i + 1) * 3], color);
+        colors->SetTuple(i, color);
+      }
+      source_->GetOutput()->GetCellData()->SetScalars(colors);
+    }
+    // source_->GetOutput()->GetCellData()->Modified();
+#if 0
     if (1) {
       // Colormap
       vtkNew<vtkLookupTable> colorLut;
@@ -74,6 +104,7 @@ class CloudHandler : public HandlerBase<CloudHandler> {
       // Set colors
       source_->GetOutput()->GetCellData()->SetScalars(colors);
     }
+#endif
 
     // NOTE(yycho0108): Update is required here
     // source_->Modified();

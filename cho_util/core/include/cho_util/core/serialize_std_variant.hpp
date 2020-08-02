@@ -8,7 +8,7 @@ namespace serialization {
 template <class Archive, typename... Ts>
 void save(Archive& ar, std::variant<Ts...> const& v, unsigned int /*version*/
 ) {
-  const auto which = v.index();
+  const std::size_t which = v.index();
   ar << which;
   std::visit([&ar](const auto& v) { ar << v; }, v);
 }
@@ -22,7 +22,7 @@ void load_variant_at_index(Archive& ar, Variant* const v,
   std::initializer_list<int>(
       {(which == Is ? (*v = std::variant_alternative_t<Is, Variant>()),
         0 : 0)...});
-  // 2) load from archive
+  // 2) load from archive.
   std::visit(
       [&ar](auto& v) {
         using T = std::decay_t<decltype(v)>;
@@ -34,7 +34,7 @@ void load_variant_at_index(Archive& ar, Variant* const v,
 
 template <class Archive, typename... Ts>
 void load(Archive& ar, std::variant<Ts...>& v, const unsigned int version) {
-  std::decay_t<decltype(v.index())> which;
+  std::size_t which;
   ar >> which;
   return detail::load_variant_at_index<Archive, std::variant<Ts...>>(
       ar, &v, which, std::make_index_sequence<sizeof...(Ts)>{});

@@ -5,7 +5,7 @@
 #include "cho_util/type/convert.hpp"
 #include "cho_util/vis/render_data.hpp"
 
-#include "fmt/printf.h"
+#include <fmt/printf.h>
 
 namespace cho {
 namespace type {

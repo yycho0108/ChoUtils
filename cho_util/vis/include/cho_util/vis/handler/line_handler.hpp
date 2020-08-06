@@ -7,6 +7,7 @@
 #include <vtkPoints.h>
 #include <vtkPolyDataAlgorithm.h>
 #include <vtkPolyDataMapper.h>
+#include <vtkPolyPointSource.h>
 
 #include "cho_util/core/geometry/line.hpp"
 #include "cho_util/vis/handler/handler_base.hpp"
@@ -86,7 +87,6 @@ class LineHandler : public HandlerBase<LineHandler> {
 
  private:
   vtkSmartPointer<vtkPolyPointSource> points_;
-  vtkSmartPointer<vtkCellArray> lines_;
   vtkSmartPointer<PointPairLineFilter> filter_;
   vtkSmartPointer<vtkPolyDataMapper> mapper_;
   vtkSmartPointer<vtkActor> actor_;

@@ -87,21 +87,20 @@ void ::cho::type::
 
   // Set Color.
   if (rd.color.size() == 3) {
-    auto color = req->mutable_uniform();
+    auto* const color = req->mutable_uniform();
     color->set_r(rd.color[0] / 255.0f);
     color->set_g(rd.color[1] / 255.0f);
     color->set_b(rd.color[2] / 255.0f);
   }
   if (rd.color.size() > 3) {
-    auto colors = req->mutable_each();
+    auto* const colors = req->mutable_each();
     colors->mutable_colors()->Reserve(rd.color.size());
     for (int i = 0; i < rd.color.size(); i += 3) {
-      auto color = colors->mutable_colors()->Add();
+      auto* const color = colors->mutable_colors()->Add();
       color->set_r(rd.color[i] / 255.0f);
       color->set_g(rd.color[i + 1] / 255.0f);
       color->set_b(rd.color[i + 2] / 255.0f);
     }
-    req->set_allocated_each(colors);
   }
 }
 

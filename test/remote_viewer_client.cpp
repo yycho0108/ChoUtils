@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <variant>
 
 #include "cho_util/core/geometry.hpp"
@@ -35,11 +36,13 @@ int main() {
   ps.resize(3, 128);
   ps.setRandom(3, 128);
 
+  std::vector<std::uint8_t> colors(128 * 3);
+  std::generate(colors.begin(), colors.end(), []() { return rand() % 256; });
   for (int i = 0; i < 1; ++i) {
     cho::vis::RenderData cloud{
         .tag = "cloud",
         .geometry = cloud_geom,
-        .color = {0, 255, 0},
+        .color = std::move(colors),
         .representation = cho::vis::RenderData::Representation::kPoints,
         .quit = false};
     viewer.Render(cloud);

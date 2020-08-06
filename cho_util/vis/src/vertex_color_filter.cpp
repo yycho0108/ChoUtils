@@ -5,14 +5,14 @@
 namespace cho {
 namespace vis {
 
-vtkStandardNewMacro(PointPairLineFilter);
+vtkStandardNewMacro(VertexColorFilter);
 
-PointPairLineFilter::PointPairLineFilter() { this->SetNumberOfInputPorts(1); }
-PointPairLineFilter::~PointPairLineFilter() {}
+VertexColorFilter::VertexColorFilter() { this->SetNumberOfInputPorts(1); }
+VertexColorFilter::~VertexColorFilter() {}
 
-int PointPairLineFilter::RequestData(vtkInformation*,
-                                     vtkInformationVector** inputVector,
-                                     vtkInformationVector* outputVector) {
+int VertexColorFilter::RequestData(vtkInformation*,
+                                   vtkInformationVector** inputVector,
+                                   vtkInformationVector* outputVector) {
   vtkPolyData* input = vtkPolyData::GetData(inputVector[0], 0);
   vtkPolyData* output = vtkPolyData::GetData(outputVector, 0);
 

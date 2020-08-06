@@ -43,8 +43,10 @@ add_library(
   include/cho_util/vis/handler/sphere_handler.hpp
   include/cho_util/vis/handler/point_pair_line_filter.hpp
   include/cho_util/vis/render_data.hpp
+  include/cho_util/vis/handler/poly_point_source.hpp
   src/handlers.cpp
   src/point_pair_line_filter.cpp
+  src/poly_point_source.cpp
   src/vtk_viewer.cpp)
 
 target_include_directories(

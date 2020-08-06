@@ -14,6 +14,7 @@
 #include <vtkInteractorStyleTrackballCamera.h>
 #include <vtkLookupTable.h>
 #include <vtkNamedColors.h>
+#include <vtkPropPicker.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderer.h>
@@ -27,6 +28,30 @@
 namespace cho {
 namespace vis {
 
+class PickableTrackballCamera : public vtkInteractorStyleTrackballCamera {
+ public:
+  static PickableTrackballCamera* New();
+  vtkTypeMacro(PickableTrackballCamera, vtkInteractorStyleTrackballCamera);
+
+  virtual void OnLeftButtonDown() override {
+    fmt::print("ONLMB\n");
+    int* clickPos = this->GetInteractor()->GetEventPosition();
+
+    // Pick from this location.
+    vtkSmartPointer<vtkPropPicker> picker =
+        vtkSmartPointer<vtkPropPicker>::New();
+    picker->Pick(clickPos[0], clickPos[1], 0, this->GetDefaultRenderer());
+
+    double* pos = picker->GetPickPosition();
+    std::cout << "Pick position (world coordinates) is: " << pos[0] << " "
+              << pos[1] << " " << pos[2] << std::endl;
+    std::cout << "Picked actor: " << picker->GetActor() << std::endl;
+    // Forward events
+    vtkInteractorStyleTrackballCamera::OnLeftButtonDown();
+  }
+};
+vtkStandardNewMacro(PickableTrackballCamera);
+
 class VtkViewer::Impl {
  public:
   using ListenerPtr = cho::vis::ListenerPtr<RenderData>;
@@ -39,6 +64,8 @@ class VtkViewer::Impl {
   void Step();
   void Spin();
   bool Render(RenderData&& data);
+
+  void OnPick(vtkObject* caller, long unsigned int event_id, void* client_data);
 
  private:
   // I/O
@@ -109,14 +136,17 @@ void VtkViewer::Impl::Start(const bool block) {
   // Interaction
   render_window_interactor_ = vtkSmartPointer<vtkRenderWindowInteractor>::New();
   render_window_interactor_->SetRenderWindow(render_window_);
-  vtkSmartPointer<vtkInteractorStyleTrackballCamera> style =
-      vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
+  vtkSmartPointer<PickableTrackballCamera> style =
+      vtkSmartPointer<PickableTrackballCamera>::New(/*this*/);
+  style->SetDefaultRenderer(renderer_);
   render_window_interactor_->SetInteractorStyle(style);
+
+  // render_window_interactor_->AddObserver(vtkCommand::KeyPressEvent, this,
+  //                                       &VtkViewer::Impl::OnLeftClick);
 
   // ListenerPtr on adding new primitives.
   // Register callback for updating or creating actors based on pipe input.
   // Start feeding data.
-
   data_listener_->SetCallback([this](RenderData&& data) -> bool {
     // return Render(std::move(data));
     RenderData cpy = data;
@@ -146,7 +176,7 @@ void VtkViewer::Impl::Start(const bool block) {
   render_window_->Render();
   render_window_interactor_->Initialize();
   render_window_interactor_->AddObserver(vtkCommand::TimerEvent, onUpdate);
-  render_window_interactor_->CreateRepeatingTimer(100);
+  // render_window_interactor_->CreateRepeatingTimer(100);
 
   if (!data_listener_->IsRunning()) {
     data_listener_->Start();
@@ -174,6 +204,11 @@ void VtkViewer::Impl::Spin() {
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
     Step();
   }
+}
+
+void VtkViewer::Impl::OnPick(vtkObject* caller, unsigned long event_id,
+                             void* client_data) {
+  fmt::print("ONPICK\n");
 }
 
 bool VtkViewer::Impl::Render(RenderData&& data) {

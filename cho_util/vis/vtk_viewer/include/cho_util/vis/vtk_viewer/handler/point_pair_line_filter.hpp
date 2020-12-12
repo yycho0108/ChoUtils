@@ -9,25 +9,25 @@
 #include <vtkPolyDataMapper.h>
 
 #include "cho_util/core/geometry/line.hpp"
-#include "cho_util/vis/handler/handler_base.hpp"
+#include "cho_util/vis/vtk_viewer/handler/handler_base.hpp"
 
 namespace cho {
 namespace vis {
 
-class VertexColorFilter : public vtkPolyDataAlgorithm {
+class PointPairLineFilter : public vtkPolyDataAlgorithm {
  public:
-  vtkTypeMacro(VertexColorFilter, vtkPolyDataAlgorithm);
-  static VertexColorFilter* New();
+  vtkTypeMacro(PointPairLineFilter, vtkPolyDataAlgorithm);
+  static PointPairLineFilter* New();
 
  protected:
-  VertexColorFilter();
-  ~VertexColorFilter();
+  PointPairLineFilter();
+  ~PointPairLineFilter();
   int RequestData(vtkInformation*, vtkInformationVector** inputVector,
                   vtkInformationVector* outputVector) override;
 
  private:
-  VertexColorFilter(const VertexColorFilter&) = delete;
-  void operator=(const VertexColorFilter&) = delete;
+  PointPairLineFilter(const PointPairLineFilter&) = delete;
+  void operator=(const PointPairLineFilter&) = delete;
 };
 
 }  // namespace vis

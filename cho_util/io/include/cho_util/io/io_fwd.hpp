@@ -2,7 +2,7 @@
 
 #include <memory>
 namespace cho {
-namespace vis {
+namespace io {
 
 struct Writer;
 using WriterPtr = std::shared_ptr<Writer>;
@@ -13,5 +13,5 @@ struct Listener;
 template <typename DataType>
 using ListenerPtr = std::shared_ptr<Listener<DataType>>;
 
-}  // namespace vis
+}  // namespace io
 }  // namespace cho

@@ -1,8 +1,8 @@
 #include "cho_util/vis/direct_viewer.hpp"
 
-#include "cho_util/vis/queue_io.hpp"
+#include "cho_util/io/queue_io.hpp"
 #include "cho_util/vis/render_data.hpp"
-#include "cho_util/vis/vtk_viewer.hpp"
+#include "cho_util/vis/vtk_viewer/vtk_viewer.hpp"
 
 namespace cho {
 namespace vis {
@@ -23,15 +23,15 @@ void DirectViewer::Start() {
   }
   started_ = true;
   StartServer();
-  data_writer_ = std::make_shared<QueueWriter<RenderData>>(data_queue_);
+  data_writer_ = std::make_shared<io::QueueWriter<RenderData>>(data_queue_);
 }
 
 void DirectViewer::StartServer() {
   // FIXME(yycho0108): should not be RenderData
-  QueueWriterPtr<RenderData> event_writer =
-      std::make_shared<QueueWriter<RenderData>>(event_queue_);
-  QueueListenerPtr<RenderData> data_listener =
-      std::make_shared<QueueListener<RenderData>>(data_queue_);
+  io::QueueWriterPtr<RenderData> event_writer =
+      std::make_shared<io::QueueWriter<RenderData>>(event_queue_);
+  io::QueueListenerPtr<RenderData> data_listener =
+      std::make_shared<io::QueueListener<RenderData>>(data_queue_);
   viewer_ =
       std::make_shared<VtkViewer>(data_listener, event_writer, true, false);
 }

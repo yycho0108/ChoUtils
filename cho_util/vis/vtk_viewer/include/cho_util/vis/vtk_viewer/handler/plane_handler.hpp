@@ -4,7 +4,7 @@
 #include <vtkPolyDataMapper.h>
 
 #include "cho_util/core/geometry/plane.hpp"
-#include "cho_util/vis/handler/handler_base.hpp"
+#include "cho_util/vis/vtk_viewer/handler/handler_base.hpp"
 
 namespace cho {
 namespace vis {

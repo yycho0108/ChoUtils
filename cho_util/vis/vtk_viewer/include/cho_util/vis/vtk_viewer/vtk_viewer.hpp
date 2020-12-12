@@ -2,11 +2,11 @@
 
 #include <memory>
 
+#include "cho_util/io/io.hpp"
 #include "cho_util/vis/event_data.hpp"
-#include "cho_util/vis/io.hpp"
 #include "cho_util/vis/render_data.hpp"
 #include "cho_util/vis/viewer_base.hpp"
-#include "cho_util/vis/vtk_viewer_fwd.hpp"
+#include "cho_util/vis/vtk_viewer/vtk_viewer_fwd.hpp"
 
 namespace cho {
 namespace vis {
@@ -16,8 +16,8 @@ class VtkViewer : ViewerBase<VtkViewer> {
   class Impl;
   std::unique_ptr<Impl> impl_;
 
-  using ListenerPtr = cho::vis::ListenerPtr<RenderData>;
-  using WriterPtr = cho::vis::WriterPtr;
+  using ListenerPtr = cho::io::ListenerPtr<RenderData>;
+  using WriterPtr = cho::io::WriterPtr;
 
  public:
   VtkViewer(const ListenerPtr listener, const WriterPtr writer,

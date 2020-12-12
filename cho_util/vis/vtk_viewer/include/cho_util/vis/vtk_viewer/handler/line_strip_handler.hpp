@@ -1,42 +1,36 @@
 #pragma once
 
-#include <vtkCellArray.h>
-#include <vtkInformation.h>
-#include <vtkInformationVector.h>
-#include <vtkLine.h>
-#include <vtkPoints.h>
-#include <vtkPolyDataAlgorithm.h>
 #include <vtkPolyDataMapper.h>
-#include <vtkPolyPointSource.h>
+#include <vtkPolyLineSource.h>
 
 #include "cho_util/core/geometry/line.hpp"
-#include "cho_util/vis/handler/handler_base.hpp"
-#include "cho_util/vis/handler/point_pair_line_filter.hpp"
+#include "cho_util/vis/vtk_viewer/handler/handler_base.hpp"
+#include "cho_util/vis/vtk_viewer/handler/point_pair_line_filter.hpp"
 
 namespace cho {
 namespace vis {
 
-class LineHandler : public HandlerBase<LineHandler> {
+#if 0
+class LineStripHandler : public HandlerBase<LineStripHandler> {
  public:
-  explicit LineHandler(const RenderData& rd) {
-    const auto& geom = std::get<core::Lines<float, 3>>(rd.geometry);
+  explicit LineStripHandler(const RenderData& rd) {
+    const auto& geom = std::get<core::Linestrip<float, 3>>(rd.geometry);
 
     // Point Source
-    points_ = vtkNew<vtkPolyPointSource>();
-    points_->Resize(geom.GetNumPoints());
+    source_ = vtkNew<vtkPolyLineSource>();
+    source_->GetPointIds()->SetNumberOfIds(geom.GetNumPoints());
+    for (int i = 0; i < geom.GetNumPoints(); ++i) {
+      source_->GetPointIds()->SetId(i, i);
+    }
     points_->SetNumberOfPoints(geom.GetNumPoints());
     for (int i = 0; i < geom.GetNumPoints(); ++i) {
       const auto& point = geom.GetPoint(i);
       points_->SetPoint(i, point.x(), point.y(), point.z());
     }
 
-    // Filter to pairwise line segments
-    filter_ = vtkNew<PointPairLineFilter>();
-    filter_->SetInputConnection(points_->GetOutputPort());
-
     // Mapper
     mapper_ = vtkNew<vtkPolyDataMapper>();
-    mapper_->SetInputConnection(filter_->GetOutputPort());
+    mapper_->SetInputConnection(source_->GetOutputPort());
 
     // Actor
     actor_ = vtkNew<vtkActor>();
@@ -86,11 +80,11 @@ class LineHandler : public HandlerBase<LineHandler> {
   vtkSmartPointer<const vtkActor> GetActor() const { return actor_; }
 
  private:
-  vtkSmartPointer<vtkPolyPointSource> points_;
-  vtkSmartPointer<PointPairLineFilter> filter_;
+  vtkSmartPointer<vtkPolyLineSource> source_;
   vtkSmartPointer<vtkPolyDataMapper> mapper_;
   vtkSmartPointer<vtkActor> actor_;
 };
+#endif
 
 }  // namespace vis
 }  // namespace cho

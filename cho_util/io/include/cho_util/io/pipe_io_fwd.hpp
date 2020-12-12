@@ -3,7 +3,7 @@
 #include <memory>
 
 namespace cho {
-namespace vis {
+namespace io {
 
 template <typename T>
 class FdListener;
@@ -14,5 +14,5 @@ using FdListenerPtr = std::shared_ptr<FdListener<T>>;
 class FdWriter;
 using FdWriterPtr = std::shared_ptr<FdWriter>;
 
-}  // namespace vis
+}  // namespace io
 }  // namespace cho

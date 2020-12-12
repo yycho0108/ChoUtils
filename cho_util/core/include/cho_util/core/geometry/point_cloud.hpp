@@ -28,6 +28,8 @@ class PointCloud : public GeometryBase<PointCloud<_Scalar, N>> {
 
   void SetNumPoints(const int n) { data_.resize(3, n); }
 
+  bool IsEmpty() const { return GetNumPoints() <= 0; }
+
  private:
   // layout: row=ndim, col=npoints
   Eigen::Matrix<Scalar, N, Eigen::Dynamic> data_;

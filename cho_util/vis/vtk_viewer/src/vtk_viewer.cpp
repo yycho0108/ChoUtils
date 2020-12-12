@@ -1,4 +1,4 @@
-#include "cho_util/vis/vtk_viewer.hpp"
+#include "cho_util/vis/vtk_viewer/vtk_viewer.hpp"
 
 #include <chrono>
 #include <thread>
@@ -22,8 +22,8 @@
 #include "cho_util/core/thread_safe_queue.hpp"
 #include "cho_util/util/mp_utils.hpp"
 #include "cho_util/vis/event_data.hpp"
-#include "cho_util/vis/handlers.hpp"
 #include "cho_util/vis/render_data.hpp"
+#include "cho_util/vis/vtk_viewer/handlers.hpp"
 
 namespace cho {
 namespace vis {
@@ -54,8 +54,8 @@ vtkStandardNewMacro(PickableTrackballCamera);
 
 class VtkViewer::Impl {
  public:
-  using ListenerPtr = cho::vis::ListenerPtr<RenderData>;
-  using WriterPtr = cho::vis::WriterPtr;
+  using ListenerPtr = cho::io::ListenerPtr<RenderData>;
+  using WriterPtr = cho::io::WriterPtr;
   Impl(const ListenerPtr listener, const WriterPtr writer, const bool start,
        const bool block = true);
 
@@ -149,9 +149,9 @@ void VtkViewer::Impl::Start(const bool block) {
   // Start feeding data.
   data_listener_->SetCallback([this](RenderData&& data) -> bool {
     // return Render(std::move(data));
-    RenderData cpy = data;
+    // RenderData cpy = data;
     // render_queue_.emplace(std::move(data));
-    render_queue_.emplace(std::move(cpy));
+    render_queue_.emplace(std::move(data));
     return false;
   });
 
@@ -239,7 +239,7 @@ bool VtkViewer::Impl::Render(RenderData&& data) {
           using T = std::decay_t<decltype(geometry)>;
           HandlerType<T> h{cache};
           renderer_->AddActor(h.GetActor());
-          hmap_.emplace(cache.tag, h);
+          hmap_.emplace(cache.tag, std::move(h));
         },
         data.geometry);
   } else {

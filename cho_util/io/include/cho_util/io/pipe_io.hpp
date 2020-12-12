@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cho_util/vis/pipe_io_fwd.hpp"
+#include "cho_util/io/pipe_io_fwd.hpp"
 
 #include <chrono>
 #include <future>
@@ -13,10 +13,10 @@
 #include <boost/iostreams/stream.hpp>
 #include <boost/iostreams/stream_buffer.hpp>
 
-#include "cho_util/vis/io.hpp"
+#include "cho_util/io/io.hpp"
 
 namespace cho {
-namespace vis {
+namespace io {
 
 /**
  * Pipe listener
@@ -108,5 +108,5 @@ class FdWriter : public Writer {
   boost::archive::binary_oarchive ar;
 };
 
-}  // namespace vis
+}  // namespace io
 }  // namespace cho

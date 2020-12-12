@@ -3,7 +3,7 @@
 #include <memory>
 
 namespace cho {
-namespace vis {
+namespace io {
 
 template <typename T>
 class QueueListener;
@@ -17,5 +17,5 @@ class QueueWriter;
 template <typename T>
 using QueueWriterPtr = std::shared_ptr<QueueWriter<T>>;
 
-}  // namespace vis
+}  // namespace io
 }  // namespace cho

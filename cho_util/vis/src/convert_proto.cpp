@@ -16,10 +16,10 @@ namespace type {
 
 CHO_DEFINE_CONVERT(proto::vis::render::RepresentationType,
                    vis::RenderData::Representation) {
-#define ADD_CASE(name, name2)                                 \
-  case ::cho::proto::vis::render::RepresentationType::name: { \
-    *target = ::cho::vis::RenderData::Representation::name2;  \
-    break;                                                    \
+#define ADD_CASE(SOURCE, TARGET)                                \
+  case ::cho::proto::vis::render::RepresentationType::SOURCE: { \
+    *target = ::cho::vis::RenderData::Representation::TARGET;   \
+    break;                                                      \
   }
 
   switch (source) {
@@ -36,10 +36,10 @@ CHO_DEFINE_CONVERT(proto::vis::render::RepresentationType,
 }
 CHO_DEFINE_CONVERT(vis::RenderData::Representation,
                    proto::vis::render::RepresentationType) {
-#define ADD_CASE(name, name2)                                       \
-  case ::cho::vis::RenderData::Representation::name: {              \
-    *target = ::cho::proto::vis::render::RepresentationType::name2; \
-    break;                                                          \
+#define ADD_CASE(SOURCE, TARGET)                                     \
+  case ::cho::vis::RenderData::Representation::SOURCE: {             \
+    *target = ::cho::proto::vis::render::RepresentationType::TARGET; \
+    break;                                                           \
   }
   switch (source) {
     ADD_CASE(kNone, kAsNone);

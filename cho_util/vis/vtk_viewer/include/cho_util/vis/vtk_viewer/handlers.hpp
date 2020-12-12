@@ -2,15 +2,15 @@
 
 #include <variant>
 
-#include "cho_util/vis/handler/handler_base.hpp"
+#include "cho_util/vis/vtk_viewer/handler/handler_base.hpp"
 
-#include "cho_util/vis/handler/cloud_handler.hpp"
-#include "cho_util/vis/handler/cuboid_handler.hpp"
-#include "cho_util/vis/handler/cylinder_handler.hpp"
-#include "cho_util/vis/handler/line_handler.hpp"
-#include "cho_util/vis/handler/plane_handler.hpp"
+#include "cho_util/vis/vtk_viewer/handler/cloud_handler.hpp"
+#include "cho_util/vis/vtk_viewer/handler/cuboid_handler.hpp"
+#include "cho_util/vis/vtk_viewer/handler/cylinder_handler.hpp"
+#include "cho_util/vis/vtk_viewer/handler/line_handler.hpp"
+#include "cho_util/vis/vtk_viewer/handler/plane_handler.hpp"
 // #include "cho_util/vis/handler/point_handler.hpp"
-#include "cho_util/vis/handler/sphere_handler.hpp"
+#include "cho_util/vis/vtk_viewer/handler/sphere_handler.hpp"
 
 namespace cho {
 namespace vis {

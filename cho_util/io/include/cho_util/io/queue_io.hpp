@@ -1,15 +1,15 @@
 #pragma once
 
-#include "cho_util/vis/queue_io_fwd.hpp"
+#include "cho_util/io/queue_io_fwd.hpp"
 
 #include <chrono>
 #include <future>
 
 #include "cho_util/core/thread_safe_queue.hpp"
-#include "cho_util/vis/io.hpp"
+#include "cho_util/io/io.hpp"
 
 namespace cho {
-namespace vis {
+namespace io {
 
 /**
  * Pipe listener
@@ -91,5 +91,5 @@ class QueueWriter : public Writer {
   }
 };
 
-}  // namespace vis
+}  // namespace io
 }  // namespace cho

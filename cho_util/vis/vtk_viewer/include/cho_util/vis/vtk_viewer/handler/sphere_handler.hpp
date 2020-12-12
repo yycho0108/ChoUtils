@@ -1,26 +1,26 @@
 #pragma once
 
-#include <vtkCubeSource.h>
 #include <vtkPolyDataMapper.h>
+#include <vtkSphereSource.h>
 
-#include "cho_util/core/geometry/cuboid.hpp"
-#include "cho_util/vis/handler/handler_base.hpp"
+#include "cho_util/core/geometry/sphere.hpp"
+#include "cho_util/vis/vtk_viewer/handler/handler_base.hpp"
 
 namespace cho {
 namespace vis {
-class CuboidHandler : public HandlerBase<CuboidHandler> {
+class SphereHandler : public HandlerBase<SphereHandler> {
  public:
-  explicit CuboidHandler(const RenderData& rd) {
-    const auto& geom = std::get<core::Cuboid<float, 3>>(rd.geometry);
-    const auto& bmin = geom.GetMin();
-    const auto& bmax = geom.GetMax();
-
+  explicit SphereHandler(const RenderData& rd) {
+    const auto& geom = std::get<core::Sphere<float, 3>>(rd.geometry);
+    const auto& center = geom.GetCenter();
+    const auto& radius = geom.GetRadius();
     // Create a plane
-    source_ = vtkNew<vtkCubeSource>();
-    source_->SetBounds(bmin[0], bmax[0], bmin[1], bmax[1], bmin[2], bmax[2]);
+    source_ = vtkNew<vtkSphereSource>();
+    source_->SetCenter(center.x(), center.y(), center.z());
+    source_->SetRadius(radius);
 
     // Create a mapper and actor
-    mapper_ = vtkNew<vtkPolyDataMapper>();  // polydata -> primitives
+    mapper_ = vtkNew<vtkPolyDataMapper>();
     mapper_->SetInputConnection(source_->GetOutputPort());
 
     actor_ = vtkNew<vtkActor>();
@@ -50,21 +50,20 @@ class CuboidHandler : public HandlerBase<CuboidHandler> {
     actor_->GetProperty()->SetOpacity(0.125);
   }
   void Update(const RenderData& data) {
-    const auto& geom = std::get<core::Cuboid<float, 3>>(data.geometry);
-    const auto& bmin = geom.GetMin();
-    const auto& bmax = geom.GetMax();
-    source_->SetBounds(bmin.x(), bmax.x(), bmin.y(), bmax.y(), bmin.z(),
-                       bmax.z());
-    source_->Update();
-    // ??
-    // source_->Modified();
+    const auto& geom = std::get<core::Sphere<float, 3>>(data.geometry);
+    const auto& center = geom.GetCenter();
+    const auto& radius = geom.GetRadius();
+    // Create a plane
+    source_->SetCenter(center.x(), center.y(), center.z());
+    source_->SetRadius(radius);
+    source_->Modified();
   }
 
   vtkSmartPointer<vtkActor> GetActor() { return actor_; }
   vtkSmartPointer<const vtkActor> GetActor() const { return actor_; }
 
  private:
-  vtkSmartPointer<vtkCubeSource> source_;
+  vtkSmartPointer<vtkSphereSource> source_;
   vtkSmartPointer<vtkPolyDataMapper> mapper_;
   vtkSmartPointer<vtkActor> actor_;
 };

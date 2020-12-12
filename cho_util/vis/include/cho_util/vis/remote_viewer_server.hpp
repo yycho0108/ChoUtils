@@ -8,8 +8,8 @@
 #include <grpc/support/log.h>
 #include <grpcpp/grpcpp.h>
 
+#include "cho_util/io/io.hpp"
 #include "cho_util/proto/render.grpc.pb.h"
-#include "cho_util/vis/io.hpp"
 #include "cho_util/vis/render_data.hpp"
 
 using grpc::Server;
@@ -33,8 +33,8 @@ using cho::proto::vis::render::RenderReply;
 using cho::proto::vis::render::RenderRequest;
 
 template <typename DataType>
-class RenderServer : public Listener<DataType> {
-  using typename Listener<DataType>::Callback;
+class RenderServer : public io::Listener<DataType> {
+  using typename io::Listener<DataType>::Callback;
 
  private:
   std::string address_;

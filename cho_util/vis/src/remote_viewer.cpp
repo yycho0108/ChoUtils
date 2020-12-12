@@ -2,11 +2,11 @@
 
 #include <future>
 
-#include "cho_util/vis/queue_io.hpp"
+#include "cho_util/io/queue_io.hpp"
 #include "cho_util/vis/remote_viewer_client.hpp"
 #include "cho_util/vis/remote_viewer_server.hpp"
 #include "cho_util/vis/render_data.hpp"
-#include "cho_util/vis/vtk_viewer.hpp"
+#include "cho_util/vis/vtk_viewer/vtk_viewer.hpp"
 
 namespace cho {
 namespace vis {
@@ -19,13 +19,13 @@ void RemoteViewerServer::Start(const std::string& address) {
 
   // FIXME(yycho0108): Make event writer do something
   auto event_queue_ = std::make_shared<thread_safe_queue<RenderData>>();
-  QueueWriterPtr<RenderData> event_writer =
-      std::make_shared<QueueWriter<RenderData>>(event_queue_);
+  io::QueueWriterPtr<RenderData> event_writer =
+      std::make_shared<io::QueueWriter<RenderData>>(event_queue_);
 
   // Start immediately + block
   viewer_ = std::make_shared<VtkViewer>(
-      std::dynamic_pointer_cast<Listener<RenderData>>(server_), event_writer,
-      true, true);
+      std::dynamic_pointer_cast<io::Listener<RenderData>>(server_),
+      event_writer, true, true);
 
   // Cleanup server thread.
   if (server_thread.joinable()) {

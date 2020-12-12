@@ -36,6 +36,7 @@ add_library(${PROJECT_NAME}::proto ALIAS cho_util_proto)
 
 generate_export_header(cho_util_proto)
 
+# Protobuf targets
 install(
   TARGETS cho_util_proto
   EXPORT ${PROJECT_NAME}Targets

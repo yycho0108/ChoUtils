@@ -8,18 +8,6 @@
 namespace cho {
 namespace core {
 
-// template <typename Scalar>
-// class AbstractGeometry {
-// public:
-//  using Ptr = std::shared_ptr<AbstractGeometry>;
-//
-// public:
-//  virtual ~AbstractGeometry() = default;
-//  virtual const Scalar* GetPtr() const = 0;
-//  virtual Scalar* GetPtr() = 0;
-//  virtual int GetSize() const = 0;
-//};
-
 template <typename Derived>
 struct GeometryTraits {};
 

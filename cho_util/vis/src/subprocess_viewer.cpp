@@ -1,10 +1,10 @@
 #include "cho_util/vis/subprocess_viewer.hpp"
 
 #include "cho_util/core/geometry.hpp"
-#include "cho_util/vis/pipe_io.hpp"
+#include "cho_util/io/pipe_io.hpp"
 #include "cho_util/vis/render_data.hpp"
 #include "cho_util/vis/subprocess.hpp"
-#include "cho_util/vis/vtk_viewer.hpp"
+#include "cho_util/vis/vtk_viewer/vtk_viewer.hpp"
 
 namespace cho {
 namespace vis {
@@ -19,14 +19,14 @@ void SubprocessViewer::Start() {
   if (IsServer()) {
     StartServer();
   } else {
-    data_writer_ = std::make_shared<FdWriter>(proc.GetWriteFd());
+    data_writer_ = std::make_shared<io::FdWriter>(proc.GetWriteFd());
   }
 }
 
 void SubprocessViewer::StartServer() {
-  FdWriterPtr writer = std::make_shared<FdWriter>(proc.GetWriteFd());
-  FdListenerPtr<RenderData> listener =
-      std::make_shared<FdListener<RenderData>>(proc.GetReadFd());
+  io::FdWriterPtr writer = std::make_shared<io::FdWriter>(proc.GetWriteFd());
+  io::FdListenerPtr<RenderData> listener =
+      std::make_shared<io::FdListener<RenderData>>(proc.GetReadFd());
   viewer_ = std::make_shared<VtkViewer>(listener, writer, true);
 }
 

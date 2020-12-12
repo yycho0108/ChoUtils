@@ -10,9 +10,9 @@
 #include <grpc/support/log.h>
 #include <grpcpp/grpcpp.h>
 
+#include "cho_util/io/io.hpp"
 #include "cho_util/proto/render.grpc.pb.h"
 #include "cho_util/vis/convert_proto.hpp"
-#include "cho_util/vis/io.hpp"
 #include "cho_util/vis/render_data.hpp"
 
 namespace cho {

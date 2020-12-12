@@ -1,11 +1,11 @@
 #pragma once
 
-#include "cho_util/vis/io_fwd.hpp"
+#include "cho_util/io/io_fwd.hpp"
 
 #include <functional>
 
 namespace cho {
-namespace vis {
+namespace io {
 
 template <typename DataType>
 struct Listener {
@@ -27,5 +27,5 @@ struct Writer {
   template <typename DataType>
   bool Send(const DataType& data, const bool flush = true);
 };
-}  // namespace vis
+}  // namespace io
 }  // namespace cho

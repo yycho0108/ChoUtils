@@ -6,10 +6,10 @@
 #include <unordered_map>
 #include <vector>
 
-#include "cho_util/vis/pipe_io_fwd.hpp"
+#include "cho_util/io/pipe_io_fwd.hpp"
 #include "cho_util/vis/render_data_fwd.hpp"
 #include "cho_util/vis/subprocess.hpp"
-#include "cho_util/vis/vtk_viewer_fwd.hpp"
+#include "cho_util/vis/vtk_viewer/vtk_viewer_fwd.hpp"
 
 namespace cho {
 namespace vis {
@@ -46,7 +46,7 @@ class SubprocessViewer {
  private:
   VtkViewerPtr viewer_;
   Subprocess proc;
-  FdWriterPtr data_writer_;
+  io::FdWriterPtr data_writer_;
   // FdListenerPtr<EventData> event_listener_;
 
   bool started_;

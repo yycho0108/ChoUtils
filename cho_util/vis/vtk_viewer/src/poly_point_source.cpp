@@ -1,4 +1,4 @@
-#include "cho_util/vis/handler/poly_point_source.hpp"
+#include "cho_util/vis/vtk_viewer/handler/poly_point_source.hpp"
 
 #include <fmt/printf.h>
 

@@ -25,6 +25,9 @@ set_target_properties(cho_util_vis_common PROPERTIES LINKER_LANGUAGE CXX)
 # VTK Viewer ...
 add_subdirectory(vtk_viewer)
 
+# FIXME(ycho-or): Enable imgui viewer.
+add_subdirectory(imgui_viewer)
+
 # GRPC Library ...
 add_library(
   cho_util_grpc_remote_viewer SHARED

@@ -4,6 +4,7 @@ add_library(
   include/cho_util/io/io_fwd.hpp include/cho_util/io/io.hpp
   include/cho_util/io/pipe_io_fwd.hpp include/cho_util/io/pipe_io.hpp
   include/cho_util/io/queue_io_fwd.hpp include/cho_util/io/queue_io.hpp
+  include/cho_util/io/filter_io_fwd.hpp include/cho_util/io/filter.hpp
   )
 
 target_include_directories(

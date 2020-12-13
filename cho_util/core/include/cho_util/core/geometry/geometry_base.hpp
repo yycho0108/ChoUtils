@@ -32,7 +32,7 @@ class GeometryBase {
   template <class Archive>
   void serialize(Archive& ar, const unsigned int version) {
     auto& data = static_cast<Derived*>(this)->data_;
-    boost::serialization::serialize_eigen(ar, data, version);
+    ar& data;
   }
 };
 

@@ -63,6 +63,7 @@ class VtkViewer::Impl {
   void Start(const bool block = true);
   void Step();
   void Spin();
+  void SetCameraPose(const Eigen::Isometry3f& pose);
   bool Render(RenderData&& data);
 
   void OnPick(vtkObject* caller, long unsigned int event_id, void* client_data);
@@ -102,6 +103,10 @@ void VtkViewer::Start(const bool block) { return impl_->Start(block); }
 void VtkViewer::Step() { return impl_->Step(); }
 
 void VtkViewer::Spin() { return impl_->Spin(); }
+
+void VtkViewer::SetCameraPose(const Eigen::Isometry3f& pose) {
+  return impl_->SetCameraPose(pose);
+}
 
 VtkViewer::Impl::Impl(const ListenerPtr listener, const WriterPtr writer,
                       const bool start, const bool block)
@@ -209,6 +214,21 @@ void VtkViewer::Impl::Spin() {
 void VtkViewer::Impl::OnPick(vtkObject* caller, unsigned long event_id,
                              void* client_data) {
   fmt::print("ONPICK\n");
+}
+
+void VtkViewer::Impl::SetCameraPose(const Eigen::Isometry3f& pose) {
+  auto* cam = renderer_->GetActiveCamera();
+  // position
+  cam->SetPosition(pose.translation().x(), pose.translation().y(),
+                   pose.translation().z());
+
+  // up
+  const Eigen::Vector3f up = pose.linear() * Eigen::Vector3f{0, 1, 0};
+  cam->SetViewUp(up.x(), up.y(), up.z());
+
+  // focal point
+  const Eigen::Vector3f foc = pose * Eigen::Vector3f{0, 0, -cam->GetDistance()};
+  cam->SetFocalPoint(foc.x(), foc.y(), foc.z());
 }
 
 bool VtkViewer::Impl::Render(RenderData&& data) {

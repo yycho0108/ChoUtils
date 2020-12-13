@@ -9,6 +9,7 @@
 #include "cho_util/io/pipe_io_fwd.hpp"
 #include "cho_util/vis/render_data_fwd.hpp"
 #include "cho_util/vis/subprocess.hpp"
+#include "cho_util/vis/viewer_base.hpp"
 #include "cho_util/vis/vtk_viewer/vtk_viewer_fwd.hpp"
 
 namespace cho {
@@ -18,7 +19,7 @@ namespace vis {
  *
  *
  */
-class SubprocessViewer {
+class SubprocessViewer : public ViewerBase<SubprocessViewer> {
  public:
   inline SubprocessViewer(const bool start) : started_(false) {
     if (start) {
@@ -41,6 +42,7 @@ class SubprocessViewer {
   void Start();
   void StartServer();
   void Render(const RenderData& data);
+  void SetCameraPose(const Eigen::Isometry3f& pose);
   void Spin();
 
  private:

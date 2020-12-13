@@ -35,6 +35,7 @@ class DirectViewer : public ViewerBase<DirectViewer> {
   void Step();
   void Spin();
   void Render(const RenderData& data);
+  void SetCameraPose(const Eigen::Isometry3f& pose);
 
   void StartServer();
 

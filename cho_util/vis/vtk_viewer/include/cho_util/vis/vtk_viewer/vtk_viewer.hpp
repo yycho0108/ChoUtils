@@ -27,6 +27,7 @@ class VtkViewer : ViewerBase<VtkViewer> {
   void Start(const bool block = true);
   void Step();
   void Spin();
+  void SetCameraPose(const Eigen::Isometry3f& pose);
   bool Render(RenderData&& data);
 };
 

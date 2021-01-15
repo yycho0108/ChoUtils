@@ -63,7 +63,7 @@ void ::cho::type::
       Convert<proto::vis::render::RepresentationType>(rd.representation));
 
   // Opacity defaults to 1.0 for now.
-  req->set_opacity(1.0f);
+  req->set_opacity(rd.opacity);
   std::visit(
       cho::util::overloaded{[&req](const core::PointCloud<float, 3>& geom) {
                               cho::type::Convert(geom, req->mutable_cloud());
@@ -111,6 +111,7 @@ void ::cho::type::Converter<
   rd->tag = req.name();
   Convert(req.representation(), &rd->representation);
   rd->quit = false;
+  rd->opacity = req.opacity();
 
   switch (req.data_case()) {
     case proto::vis::render::RenderRequest::DataCase::kCloud: {

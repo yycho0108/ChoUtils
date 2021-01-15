@@ -28,8 +28,10 @@ add_library(
   include/cho_util/vis/vtk_viewer/handler/sphere_handler.hpp
   include/cho_util/vis/vtk_viewer/handler/point_pair_line_filter.hpp
   include/cho_util/vis/vtk_viewer/handler/poly_point_source.hpp
+  include/cho_util/vis/vtk_viewer/handler/color_filter.hpp
   src/point_pair_line_filter.cpp
   src/poly_point_source.cpp
+  src/color_filter.cpp
   src/vtk_viewer.cpp)
 
 target_include_directories(

@@ -27,13 +27,10 @@ struct RenderData {
   friend class boost::serialization::access;
   template <class Archive>
   void serialize(Archive& ar, const unsigned int version) {
-    // auto& rep =
-    // reinterpret_cast<std::underlying_type<Representation>::type&>(
-    // representation);
     ar& tag;
     ar& geometry;
     ar& color;
-    // ar& rep;
+    ar& opacity;
     ar& representation;
     ar& quit;
   }
@@ -41,6 +38,7 @@ struct RenderData {
   std::string tag;
   core::GeometryVariant geometry;
   std::vector<std::uint8_t> color;
+  float opacity;
   Representation representation;
   bool quit;
 };

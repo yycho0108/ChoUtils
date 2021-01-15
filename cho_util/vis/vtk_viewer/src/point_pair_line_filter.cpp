@@ -1,6 +1,8 @@
 #include "cho_util/vis/vtk_viewer/handler/point_pair_line_filter.hpp"
 
 #include <fmt/printf.h>
+#include <vtkCellData.h>
+#include <vtkPointData.h>
 
 namespace cho {
 namespace vis {
@@ -16,12 +18,11 @@ int PointPairLineFilter::RequestData(vtkInformation*,
   vtkPolyData* input = vtkPolyData::GetData(inputVector[0], 0);
   vtkPolyData* output = vtkPolyData::GetData(outputVector, 0);
 
-  // points stay the same
+  // Points stay the same.
   output->SetPoints(input->GetPoints());
 
-  // pairwise lines are added.
+  // Pairwise lines are added.
   const int n = input->GetNumberOfPoints() / 2;
-  fmt::print("#lines = {}\n", n);
   vtkNew<vtkCellArray> lines;
   for (int i = 0; i < n; ++i) {
     vtkNew<vtkLine> line;
@@ -30,9 +31,8 @@ int PointPairLineFilter::RequestData(vtkInformation*,
     lines->InsertNextCell(line);
   }
 
-  // commit lines.
+  // Commit lines.
   output->SetLines(lines);
-
   return 1;
 }
 }  // namespace vis

@@ -23,10 +23,10 @@ class PointCloud : public GeometryBase<PointCloud<_Scalar, N>> {
   const auto& GetData() const { return data_; }
 
   int GetNumPoints() const { return data_.cols(); }
+  void SetNumPoints(const int n) { data_.resize(N, n); }
+
   auto GetPoint(const int i) { return data_.col(i); }
   const auto GetPoint(const int i) const { return data_.col(i); }
-
-  void SetNumPoints(const int n) { data_.resize(3, n); }
 
   bool IsEmpty() const { return GetNumPoints() <= 0; }
 

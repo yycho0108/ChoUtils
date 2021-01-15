@@ -52,3 +52,5 @@ install(
   FILES_MATCHING
   PATTERN "*.hpp"
   PATTERN "*/*.hpp")
+
+add_subdirectory(test)
